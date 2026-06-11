@@ -164,15 +164,15 @@ html,body{height:100%;overflow:hidden;background:var(--dark);font-family:-apple-
 .del-btn{border:none;background:none;cursor:pointer;font-size:16px;padding:4px;font-family:inherit}
 .tot-bar{background:var(--dark);border-radius:12px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;margin-top:12px}
 /* CAUSALES */
-.ci{border:1.5px solid var(--border);border-radius:12px;margin-bottom:10px;background:#fff;display:block;width:100%}
+.ci{border:1.5px solid var(--border);border-radius:12px;margin-bottom:10px;background:#fff;display:block;width:100%;position:relative;clear:both;overflow:hidden}
 .ci.sel{border-color:var(--blue);border-width:2px}
-.ci-row{display:flex;align-items:center;gap:11px;padding:14px;cursor:pointer}
+.ci-row{display:flex;align-items:center;gap:11px;padding:14px;cursor:pointer;width:100%;box-sizing:border-box}
 .ci-radio{width:20px;height:20px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center}
 .ci.sel .ci-radio{border-color:var(--blue);background:var(--blue)}
 .ci-dot{width:7px;height:7px;border-radius:50%;background:#fff;display:none}
 .ci.sel .ci-dot{display:block}
 .ci-txt{font-size:14px;font-weight:500;color:var(--text);line-height:1.4}
-.ci-det{display:block;width:100%;border-top:2px solid var(--blue);padding:16px 14px;background:#EFF6FF;border-radius:0 0 10px 10px}
+.ci-det{display:block;width:100%;border-top:2px solid var(--blue);padding:16px 14px;background:#EFF6FF;border-radius:0 0 10px 10px;box-sizing:border-box;position:relative;clear:both}
 .ci-det-ttl{font-size:12px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px;padding:8px 11px;background:rgba(37,99,235,.1);border-radius:8px}
 .ci-lbl{font-size:12px;font-weight:600;color:var(--dark2);text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:7px;line-height:1.4}
 .mt8{margin-top:10px}
@@ -182,6 +182,7 @@ html,body{height:100%;overflow:hidden;background:var(--dark);font-family:-apple-
 .ci-sel:focus{border-color:var(--blue)}
 .ci-ta{width:100%;border:1.5px solid #93C5FD;border-radius:10px;padding:11px 13px;font-size:14px;color:var(--text);outline:none;background:#fff;resize:none;font-family:inherit;text-transform:uppercase}
 .ci-ta:focus{border-color:var(--blue)}
+#caus-body{display:block;width:100%}
 .sku-row{display:flex;align-items:center;gap:8px;margin-bottom:9px}
 .sku-row .ci-inp{margin-bottom:0;flex:1}
 .sku-num{width:24px;height:24px;border-radius:50%;background:var(--blue);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}

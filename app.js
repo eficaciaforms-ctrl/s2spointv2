@@ -712,6 +712,11 @@ function selC(i) {
 function buildCausalDet(i, c) {
   var distGen  = (typeof DIST_GENERALES !== 'undefined') ? DIST_GENERALES : [];
   var distUser = DIST_MAP[APP_USER] || [];
+  var catOpts  = '<option value="">Seleccionar producto</option>';
+  for (var k = 0; k < CATALOGO.length; k++) {
+    catOpts += '<option value="' + CATALOGO[k].e + '">' + CATALOGO[k].n + '</option>';
+  }
+
   var h = '<div class="ci-det" onclick="event.stopPropagation()">';
   h += '<div class="ci-det-ttl">\u26a0 INFORMACION OBLIGATORIA</div>';
 
@@ -720,7 +725,7 @@ function buildCausalDet(i, c) {
     for (var n = 0; n < 3; n++) {
       h += '<div class="sku-row">';
       h += '<div class="sku-num">' + (n + 1) + '</div>';
-      h += '<input id="cs' + i + 's' + n + '" class="ci-inp" placeholder="NOMBRE DEL SKU ' + (n + 1) + '..." oninput="this.value=this.value.toUpperCase()"/>';
+      h += '<select id="cs' + i + 's' + n + '" class="ci-sel" style="margin-bottom:0;flex:1">' + catOpts + '</select>';
       h += '</div>';
     }
     h += '<label class="ci-lbl mt8">\u00bfCUANTAS UNIDADES TIENE APROX? <span class="req">*</span></label>';
@@ -745,7 +750,7 @@ function buildCausalDet(i, c) {
     for (var n = 0; n < 3; n++) {
       h += '<div class="sku-row">';
       h += '<div class="sku-num">' + (n + 1) + '</div>';
-      h += '<input id="cg' + i + 's' + n + '" class="ci-inp" placeholder="NOMBRE DEL SKU ' + (n + 1) + '..." oninput="this.value=this.value.toUpperCase()"/>';
+      h += '<select id="cg' + i + 's' + n + '" class="ci-sel" style="margin-bottom:0;flex:1">' + catOpts + '</select>';
       h += '</div>';
     }
     h += '<label class="ci-lbl mt8">\u00bfA QUE DISTRIBUIDORA LE COMPRA? <span class="req">*</span></label>';
@@ -761,8 +766,6 @@ function buildCausalDet(i, c) {
 
   else if (c.tipo === 'calidad') {
     h += '<label class="ci-lbl">\u00bfA QUE PRODUCTO HACE REFERENCIA? <span class="req">*</span></label>';
-    var catOpts = '<option value="">Seleccionar producto</option>';
-    for (var k = 0; k < CATALOGO.length; k++) catOpts += '<option value="' + CATALOGO[k].e + '">' + CATALOGO[k].n + '</option>';
     h += '<select id="cca' + i + '" class="ci-sel">' + catOpts + '</select>';
     h += '<label class="ci-lbl mt8">DETALLA EL COMENTARIO DEL CLIENTE <span class="req">*</span></label>';
     h += '<textarea id="ccc' + i + '" class="ci-ta" rows="3" placeholder="DESCRIBE LO QUE DICE EL CLIENTE..."></textarea>';
@@ -770,9 +773,7 @@ function buildCausalDet(i, c) {
 
   else if (c.tipo === 'diststock') {
     h += '<label class="ci-lbl">\u00bfQUE PRODUCTO DESEA EL PDV? <span class="req">*</span></label>';
-    var skuOpts = '<option value="">Seleccionar producto</option>';
-    for (var k = 0; k < CATALOGO.length; k++) skuOpts += '<option value="' + CATALOGO[k].e + '">' + CATALOGO[k].n + '</option>';
-    h += '<select id="cds' + i + 'sku" class="ci-sel">' + skuOpts + '</select>';
+    h += '<select id="cds' + i + 'sku" class="ci-sel">' + catOpts + '</select>';
     h += '<label class="ci-lbl mt8">\u00bfQUE CANTIDAD DESEA? <span class="req">*</span></label>';
     h += '<div class="qty-wrap">';
     h += '<button class="qbtn" onclick="qMinus(\'cds' + i + 'qty\')">\u2212</button>';
@@ -793,6 +794,7 @@ function buildCausalDet(i, c) {
   return h;
 }
 
+
 function qMinus(id) { var e = ge(id); if (e) e.value = Math.max(1, (parseInt(e.value, 10) || 1) - 1); }
 function qPlus(id)  { var e = ge(id); if (e) e.value = (parseInt(e.value, 10) || 1) + 1; }
 
@@ -810,7 +812,10 @@ function getCausalDet() {
 
   if (c.tipo === 'stock') {
     var skus = [];
-    for (var n = 0; n < 3; n++) { el = ge('cs' + i + 's' + n); if (el && el.value.trim()) skus.push(el.value.trim()); }
+    for (var n = 0; n < 3; n++) {
+      el = ge('cs' + i + 's' + n);
+      if (el && el.value) skus.push(skuNombre(el.value));
+    }
     if (skus.length) parts.push('SKUs: ' + skus.join(', '));
     el = ge('csq' + i); if (el && el.value) parts.push('Cant: ' + el.value + ' UND');
     el = ge('csp' + i); if (el && el.value) parts.push('Precio venta: ' + el.value);
@@ -821,7 +826,10 @@ function getCausalDet() {
   }
   else if (c.tipo === 'margen') {
     var skus2 = [];
-    for (var n = 0; n < 3; n++) { el = ge('cg' + i + 's' + n); if (el && el.value.trim()) skus2.push(el.value.trim()); }
+    for (var n = 0; n < 3; n++) {
+      el = ge('cg' + i + 's' + n);
+      if (el && el.value) skus2.push(skuNombre(el.value));
+    }
     if (skus2.length) parts.push('SKUs: ' + skus2.join(', '));
     el = ge('cgd' + i); if (el && el.value) parts.push('Dist compra: ' + el.value);
     el = ge('cgc' + i); if (el && el.value) parts.push('Compra: ' + el.value);
@@ -841,6 +849,7 @@ function getCausalDet() {
   return parts.join(' | ');
 }
 
+
 function validarCausal() {
   if (REL_CAUSAL === null) { alert('Selecciona una causal de no venta'); return false; }
   var c = CAUSALES[REL_CAUSAL];
@@ -848,7 +857,7 @@ function validarCausal() {
   var el;
 
   if (c.tipo === 'stock') {
-    el = ge('cs' + i + 's0'); if (!el || !el.value.trim()) { alert('Indica al menos 1 SKU que tiene en stock'); return false; }
+    el = ge('cs' + i + 's0'); if (!el || !el.value) { alert('Selecciona al menos 1 SKU que tiene en stock'); return false; }
     el = ge('csp' + i);       if (!el || !el.value.trim()) { alert('Indica a cuanto vende la unidad o doc'); return false; }
   }
   if (c.tipo === 'precio') {
@@ -856,8 +865,8 @@ function validarCausal() {
     el = ge('cpp' + i); if (!el || !el.value.trim()) { alert('Indica a cuanto vende'); return false; }
   }
   if (c.tipo === 'margen') {
-    el = ge('cg' + i + 's0'); if (!el || !el.value.trim()) { alert('Indica al menos 1 SKU en stock'); return false; }
-    el = ge('cgd' + i);        if (!el || !el.value)        { alert('Selecciona la distribuidora a la que le compra'); return false; }
+    el = ge('cg' + i + 's0'); if (!el || !el.value) { alert('Selecciona al menos 1 SKU en stock'); return false; }
+    el = ge('cgd' + i);        if (!el || !el.value) { alert('Selecciona la distribuidora a la que le compra'); return false; }
     el = ge('cgc' + i);        if (!el || !el.value.trim()) { alert('Indica a cuanto lo compra'); return false; }
     el = ge('cgv' + i);        if (!el || !el.value.trim()) { alert('Indica a cuanto lo vende'); return false; }
   }
@@ -873,6 +882,7 @@ function validarCausal() {
   }
   return true;
 }
+
 
 // ─── REVISAR / CONFIRMAR ─────────────────────────────────
 function revisarRelevo() {
