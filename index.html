@@ -863,6 +863,21 @@ html,body{height:100%;overflow:hidden;background:var(--dark);font-family:-apple-
   </div>
 </div>
 
+<!-- ══════ MODAL: SOLICITAR EDITAR RELEVO (PROMOTORA) ══════ -->
+<div class="modal" id="m-edit-prom">
+  <div class="modal-sheet">
+    <div class="m-handle"></div>
+    <p style="font-size:17px;font-weight:700;color:var(--text);margin-bottom:4px">✏️ Solicitar editar pedido</p>
+    <p style="font-size:13px;color:var(--t2);margin-bottom:6px" id="editp-titulo"></p>
+    <p style="font-size:12px;color:#1E40AF;background:var(--blue-l);border-radius:8px;padding:8px 10px;margin-bottom:14px">Los cambios necesitan aprobación del supervisor antes de actualizarse en Google Sheets</p>
+    <div id="editp-body"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px">
+      <button class="btn btn-white btn-sm" type="button" onclick="closeModal('m-edit-prom')">Cancelar</button>
+      <button class="btn btn-blue btn-sm" type="button" onclick="enviarSolicitudEdicion()">📩 Enviar solicitud</button>
+    </div>
+  </div>
+</div>
+
 <!-- ══════ MODAL: ALERTA ══════ -->
 <div class="modal" id="m-alerta">
   <div class="modal-sheet">

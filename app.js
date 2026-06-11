@@ -1218,14 +1218,181 @@ function fHist(f, btn) {
     html += '<span class="tag ' + (r.modo === 'si' ? 'tg-green' : 'tg-amber') + '">' + (r.modo === 'si' ? '\u2713 S/ ' + fmt(r.total) : '\u2715 Sin pedido') + '</span>';
     html += '<span class="tag tg-gray">' + (r.giro || '') + '</span>';
     html += '<span class="tag ' + (r.synced ? 'tg-teal' : 'tg-amber') + '">' + (r.synced ? '\u2713 Sync' : 'Pendiente') + '</span>';
+    if (r.pendienteBorrar)  html += '<span class="tag tg-red">\u23f3 Solicitud de eliminacion enviada</span>';
+    if (r.pendienteEdicion) html += '<span class="tag tg-blue">\u23f3 Edicion enviada al supervisor</span>';
     html += '</div>' + pedHtml + cauHtml;
     if (r.obs) html += '<p class="hist-obs">\ud83d\udcac ' + r.obs + '</p>';
     html += '</div><div class="hi-foot">';
-    html += '<button class="btn-xs btn-del" onclick="borrarRelevo(' + r.id + ')">\ud83d\uddd1 Eliminar</button>';
+    if (r.modo === 'si') {
+      html += '<button class="btn-xs" style="background:#DBEAFE;color:#1E40AF" onclick="solicitarEditarRelevo(\'' + r.id + '\')">\u270f\ufe0f Solicitar editar</button>';
+    }
+    html += '<button class="btn-xs btn-del" onclick="solicitarBorrarRelevo(\'' + r.id + '\')">\ud83d\uddd1 Solicitar eliminar</button>';
     html += '</div></div>';
   }
   list.innerHTML = html;
 }
+
+// ─── BUSCAR SUPERVISOR A CARGO DE LA PROMOTORA ───────────
+function supervisorDe(usuario) {
+  if (typeof SUP_MAP === 'undefined') return '';
+  for (var sup in SUP_MAP) {
+    var lista = SUP_MAP[sup] || [];
+    for (var i = 0; i < lista.length; i++) {
+      if (lista[i] === usuario) return sup;
+    }
+  }
+  return '';
+}
+
+// ─── SOLICITAR BORRAR (promotora pide aprobacion al supervisor) ───
+function solicitarBorrarRelevo(idr) {
+  var reg = null;
+  for (var i = 0; i < APP_HIST.length; i++) {
+    if (String(APP_HIST[i].id) === String(idr)) { reg = APP_HIST[i]; break; }
+  }
+  if (!reg) { alert('No se encontro el relevo'); return; }
+  if (!confirm('\u00bfSolicitar eliminar este relevo?\n\nPDV: ' + reg.pdv + '\n\nTu supervisor debera aprobar esta solicitud antes de que se elimine del sistema.')) return;
+
+  var sup = supervisorDe(APP_USER);
+  if (!sup) { alert('No se encontro tu supervisor a cargo. Avisale antes de solicitar la eliminacion.'); return; }
+
+  var antes = '';
+  if (reg.modo === 'si') {
+    antes = 'Pedido S/ ' + fmt(reg.total || 0);
+    if (reg.pedido && reg.pedido.length) {
+      antes += ' (' + reg.pedido.length + ' SKU' + (reg.pedido.length !== 1 ? 's' : '') + ')';
+    }
+  } else {
+    antes = 'Sin pedido' + (reg.causalTxt ? ' \u2014 ' + reg.causalTxt : '');
+  }
+
+  gasPost({
+    accion: 'SOLICITAR_MOD',
+    usuario: APP_USER,
+    supervisor: sup,
+    tipo: 'BORRAR',
+    id_relevo: String(idr),
+    pdv: reg.pdv || '',
+    fecha_relevo: reg.fecha || APP_FECHA,
+    antes: antes,
+    despues: 'ELIMINAR este relevo',
+    payload: null
+  }, function(ok) {
+    if (ok) {
+      // Marcar visualmente en local (sin borrar) que esta esperando aprobacion
+      reg.pendienteBorrar = true;
+      saveHist();
+      renderHist();
+      alert('\u2713 Solicitud enviada a tu supervisor (' + sup + ').\n\nEl relevo se eliminara cuando el supervisor la apruebe.');
+    } else {
+      alert('\u26a0\ufe0f No se pudo enviar la solicitud. Verifica tu conexion.');
+    }
+  });
+}
+
+// ─── SOLICITAR EDITAR (abre modal con SKUs editables) ───
+var _editProm = null;
+
+function solicitarEditarRelevo(idr) {
+  var reg = null;
+  for (var i = 0; i < APP_HIST.length; i++) {
+    if (String(APP_HIST[i].id) === String(idr)) { reg = APP_HIST[i]; break; }
+  }
+  if (!reg) { alert('No se encontro el relevo'); return; }
+  if (reg.modo !== 'si' || !reg.pedido || !reg.pedido.length) {
+    alert('Solo se pueden editar relevos CON pedido.');
+    return;
+  }
+  // Clonar items para edicion
+  _editProm = {
+    id: String(idr),
+    pdv: reg.pdv,
+    items: JSON.parse(JSON.stringify(reg.pedido))
+  };
+  renderEditPromModal();
+  openModal('m-edit-prom');
+}
+
+function renderEditPromModal() {
+  if (!_editProm) return;
+  var tit = ge('editp-titulo');
+  if (tit) tit.textContent = _editProm.pdv;
+  var body = ge('editp-body');
+  if (!body) return;
+  var html = '';
+  for (var i = 0; i < _editProm.items.length; i++) {
+    var it = _editProm.items[i];
+    html += '<div style="background:#F8FAFC;border-radius:10px;padding:11px;margin-bottom:9px">';
+    html += '<p style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:8px">' + it.n + '</p>';
+    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
+    html += '<div><label class="lbl" style="font-size:10px">Cantidad</label>';
+    html += '<input id="editp-qty-' + i + '" class="inp" type="number" min="1" step="1" inputmode="numeric" value="' + it.qty + '" style="height:40px"/></div>';
+    html += '<div><label class="lbl" style="font-size:10px">Precio UND S/</label>';
+    html += '<input id="editp-price-' + i + '" class="inp" type="number" min="0" step="0.01" inputmode="decimal" value="' + it.price + '" style="height:40px"/></div>';
+    html += '</div></div>';
+  }
+  body.innerHTML = html;
+}
+
+function enviarSolicitudEdicion() {
+  if (!_editProm) return;
+  var items = _editProm.items;
+  var total = 0;
+  for (var i = 0; i < items.length; i++) {
+    var qe = ge('editp-qty-' + i);
+    var pe = ge('editp-price-' + i);
+    var q  = qe ? parseInt(qe.value, 10) : items[i].qty;
+    var p  = pe ? parseFloat(pe.value)  : items[i].price;
+    if (isNaN(q) || q < 1) { alert('Cantidad invalida en SKU ' + (i+1)); return; }
+    if (isNaN(p) || p < 0) { alert('Precio invalido en SKU ' + (i+1)); return; }
+    items[i].qty = q;
+    items[i].price = p;
+    total += q * p;
+  }
+  var sup = supervisorDe(APP_USER);
+  if (!sup) { alert('No se encontro tu supervisor a cargo. Avisale antes de solicitar la edicion.'); return; }
+
+  // Buscar el relevo original para el "antes"
+  var reg = null;
+  for (var j = 0; j < APP_HIST.length; j++) {
+    if (String(APP_HIST[j].id) === _editProm.id) { reg = APP_HIST[j]; break; }
+  }
+  var antes = reg ? 'S/ ' + fmt(reg.total || 0) + ' (' + (reg.pedido || []).length + ' SKUs)' : '';
+  var despues = 'S/ ' + fmt(total) + ' (' + items.length + ' SKUs)';
+
+  closeModal('m-edit-prom');
+  if (!confirm('\u00bfEnviar solicitud de edicion a tu supervisor?\n\nNuevo total: S/ ' + fmt(total) + '\n\nTu supervisor (' + sup + ') debera aprobarla para que se actualice en el sistema.')) {
+    return;
+  }
+
+  gasPost({
+    accion: 'SOLICITAR_MOD',
+    usuario: APP_USER,
+    supervisor: sup,
+    tipo: 'EDITAR',
+    id_relevo: _editProm.id,
+    pdv: _editProm.pdv,
+    fecha_relevo: reg ? reg.fecha : APP_FECHA,
+    antes: antes,
+    despues: despues,
+    payload: {items: items, total: total}
+  }, function(ok) {
+    if (ok) {
+      // Marcar visualmente en local
+      if (reg) {
+        reg.pendienteEdicion = true;
+        saveHist();
+        renderHist();
+      }
+      alert('\u2713 Solicitud enviada a tu supervisor (' + sup + ').\n\nLos cambios se aplicaran cuando el supervisor apruebe la solicitud.');
+    } else {
+      alert('\u26a0\ufe0f No se pudo enviar la solicitud. Verifica tu conexion.');
+    }
+  });
+  _editProm = null;
+}
+
+// ─── BORRAR LOCAL (solo se llama tras aprobacion del supervisor — uso interno) ───
 
 function borrarRelevo(id) {
   if (!confirm('\u00bfEliminar este relevo?')) return;
@@ -1736,7 +1903,17 @@ function renderApro() {
     if (resp && resp.status === 'ok' && resp.mods) {
       for (var i = 0; i < resp.mods.length; i++) {
         var m = resp.mods[i];
-        APRO.push({id: String(m[0]), user: m[2], pdv: m[3], fecha: m[4], antes: m[5], despues: m[6]});
+        APRO.push({
+          id:     String(m[0]),
+          fecha:  m[1],
+          user:   m[2],
+          pdv:    m[3],
+          fechaRel: m[4],
+          antes:  m[5],
+          despues: m[6],
+          tipo:   String(m[8] || 'EDITAR').toUpperCase(),
+          idRel:  String(m[10] || '')
+        });
       }
     }
     pintarApro();
@@ -1758,9 +1935,20 @@ function pintarApro() {
   var html = '<button class="btn btn-dark" style="margin-bottom:12px" onclick="aproTodas()">\u2705 Aprobar todas las modificaciones</button>';
   for (var i = 0; i < APRO.length; i++) {
     var a = APRO[i];
+    var tipoLbl = a.tipo === 'BORRAR' ? '\ud83d\uddd1 Eliminar relevo' : '\u270f\ufe0f Editar relevo';
+    var tipoTag = a.tipo === 'BORRAR' ? 'tg-red' : 'tg-blue';
     html += '<div class="apr-item">';
-    html += '<div class="apr-top"><div class="apr-av">' + a.user.slice(-2) + '</div><div><p class="apr-user">' + a.user + '</p><p class="apr-fecha">Modificacion \u00b7 ' + a.fecha + '</p></div></div>';
-    html += '<div class="apr-det"><p class="apr-pdv">' + a.pdv + '</p><p class="apr-antes">Antes: ' + a.antes + '</p><p class="apr-despues">Despues: ' + a.despues + '</p></div>';
+    html += '<div class="apr-top">';
+    html += '<div class="apr-av">' + (a.user || '').slice(-2) + '</div>';
+    html += '<div style="flex:1"><p class="apr-user">' + a.user + '</p><p class="apr-fecha">' + a.fecha + '</p></div>';
+    html += '<span class="tag ' + tipoTag + '">' + tipoLbl + '</span>';
+    html += '</div>';
+    html += '<div class="apr-det">';
+    html += '<p class="apr-pdv">' + a.pdv + '</p>';
+    html += '<p style="font-size:11px;color:var(--t3);margin-bottom:6px">Fecha relevo: ' + a.fechaRel + '</p>';
+    html += '<p class="apr-antes">Antes: ' + a.antes + '</p>';
+    html += '<p class="apr-despues">Despues: ' + a.despues + '</p>';
+    html += '</div>';
     html += '<div class="apr-btns">';
     html += '<button class="btn-xs btn-del" onclick="resolverMod(\'' + a.id + '\',\'RECHAZAR\')">\u2715 Rechazar</button>';
     html += '<button class="btn-xs btn-apr" onclick="resolverMod(\'' + a.id + '\',\'APROBAR\')">\u2713 Aprobar</button>';
@@ -1770,11 +1958,22 @@ function pintarApro() {
 }
 
 function resolverMod(id, res) {
-  gasPost({accion: 'RESOLVER_MOD', id_mod: id, resolucion: res}, null);
-  var n = [];
-  for (var i = 0; i < APRO.length; i++) if (APRO[i].id !== id) n.push(APRO[i]);
-  APRO = n;
-  pintarApro();
+  var accionLbl = res === 'APROBAR' ? 'aprobar' : 'rechazar';
+  if (!confirm('\u00bfDeseas ' + accionLbl + ' esta solicitud?')) return;
+  gasPost({accion: 'RESOLVER_MOD', id_mod: id, resolucion: res}, function(ok) {
+    if (ok) {
+      alert(res === 'APROBAR' ? '\u2713 Solicitud aprobada. Los cambios ya se reflejaron en Google Sheets.' : '\u2715 Solicitud rechazada.');
+      // Quitar de la lista local
+      var n = [];
+      for (var i = 0; i < APRO.length; i++) if (APRO[i].id !== id) n.push(APRO[i]);
+      APRO = n;
+      pintarApro();
+      // Recargar datos del equipo para reflejar cambios
+      if (typeof cargarDataEquipo === 'function') cargarDataEquipo();
+    } else {
+      alert('\u26a0\ufe0f No se pudo procesar. Verifica tu conexion.');
+    }
+  });
 }
 
 function aproTodas() {
