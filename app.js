@@ -851,8 +851,8 @@ function buildCausalDet(i, c) {
       h += '<input id="cs' + i + 'q' + n + '" value="1" class="qty-inp" inputmode="numeric"/>';
       h += '<button class="qbtn" onclick="qPlus(\'cs' + i + 'q' + n + '\')">+</button>';
       h += '<span class="qty-lbl">UNIDADES</span></div>';
-      h += '<label class="ci-lbl" style="font-size:11px">Precio venta (UND o DOC mayorista)</label>';
-      h += '<input id="cs' + i + 'p' + n + '" class="ci-inp" style="margin-bottom:0" placeholder="Ej. S/ 1.80 x UND"/>';
+      h += '<label class="ci-lbl" style="font-size:11px">Precio venta UND (solo numero)</label>';
+      h += '<input id="cs' + i + 'p' + n + '" class="ci-inp" style="margin-bottom:0" type="number" step="0.01" min="0" inputmode="decimal" placeholder="Ej. 1.80"/>';
       h += '</div>';
     }
   }
@@ -873,10 +873,10 @@ function buildCausalDet(i, c) {
       h += '<div class="sku-num">' + (n + 1) + '</div>';
       h += '<select id="cg' + i + 's' + n + '" class="ci-sel" style="margin-bottom:0;flex:1">' + catOpts + '</select>';
       h += '</div>';
-      h += '<label class="ci-lbl" style="font-size:11px">Precio compra</label>';
-      h += '<input id="cg' + i + 'c' + n + '" class="ci-inp" style="margin-bottom:8px" placeholder="Ej. S/ 1.20 x UND"/>';
-      h += '<label class="ci-lbl" style="font-size:11px">Precio venta (mayorista)</label>';
-      h += '<input id="cg' + i + 'v' + n + '" class="ci-inp" style="margin-bottom:0" placeholder="Ej. S/ 1.50 x UND"/>';
+      h += '<label class="ci-lbl" style="font-size:11px">Precio compra UND (solo numero)</label>';
+      h += '<input id="cg' + i + 'c' + n + '" class="ci-inp" style="margin-bottom:8px" type="number" step="0.01" min="0" inputmode="decimal" placeholder="Ej. 1.20"/>';
+      h += '<label class="ci-lbl" style="font-size:11px">Precio venta UND mayorista (solo numero)</label>';
+      h += '<input id="cg' + i + 'v' + n + '" class="ci-inp" style="margin-bottom:0" type="number" step="0.01" min="0" inputmode="decimal" placeholder="Ej. 1.50"/>';
       h += '</div>';
     }
     h += '<label class="ci-lbl mt8">\u00bfA QUE DISTRIBUIDORA LE COMPRA? <span class="req">*</span></label>';
@@ -950,7 +950,7 @@ function getCausalDet() {
       var pr = ge('cs' + i + 'p' + n);
       var linea = nm;
       if (qt && qt.value) linea += ' (' + qt.value + ' UND';
-      if (pr && pr.value) linea += (qt && qt.value ? ', ' : ' (') + pr.value;
+      if (pr && pr.value) linea += (qt && qt.value ? ', ' : ' (') + 'S/ ' + fmt(pr.value);
       if (qt && qt.value || pr && pr.value) linea += ')';
       lineas.push(linea);
     }
@@ -970,8 +970,8 @@ function getCausalDet() {
       var pv = ge('cg' + i + 'v' + n);
       var linea2 = nm2;
       var extras = [];
-      if (pc && pc.value) extras.push('compra ' + pc.value);
-      if (pv && pv.value) extras.push('venta ' + pv.value);
+      if (pc && pc.value) extras.push('compra S/ ' + fmt(pc.value));
+      if (pv && pv.value) extras.push('venta S/ ' + fmt(pv.value));
       if (extras.length) linea2 += ' (' + extras.join(', ') + ')';
       lineas2.push(linea2);
     }
@@ -1010,12 +1010,17 @@ function validarCausal() {
 
   if (c.tipo === 'stock') {
     el = ge('cs' + i + 's0'); if (!el || !el.value) { alert('Selecciona al menos 1 SKU que tiene en stock'); return false; }
-    // Para cada SKU seleccionado, exigir precio venta
+    // Para cada SKU seleccionado, exigir precio venta numerico
     for (var n = 0; n < 3; n++) {
       var sk = ge('cs' + i + 's' + n);
       if (sk && sk.value) {
         var pr = ge('cs' + i + 'p' + n);
-        if (!pr || !pr.value.trim()) { alert('Completa el precio de venta del SKU ' + (n+1)); return false; }
+        var prNum = pr ? parseFloat(pr.value) : NaN;
+        if (!pr || !pr.value || isNaN(prNum) || prNum <= 0) {
+          alert('Ingresa un precio de venta valido (solo numero, mayor a 0) para el SKU ' + (n+1));
+          if (pr) pr.focus();
+          return false;
+        }
       }
     }
   }
@@ -1026,14 +1031,24 @@ function validarCausal() {
   if (c.tipo === 'margen') {
     el = ge('cg' + i + 's0'); if (!el || !el.value) { alert('Selecciona al menos 1 SKU en stock'); return false; }
     el = ge('cgd' + i);        if (!el || !el.value) { alert('Selecciona la distribuidora a la que le compra'); return false; }
-    // Para cada SKU seleccionado, exigir compra y venta
+    // Para cada SKU seleccionado, exigir compra y venta numericos
     for (var n = 0; n < 3; n++) {
       var sk2 = ge('cg' + i + 's' + n);
       if (sk2 && sk2.value) {
         var pc = ge('cg' + i + 'c' + n);
-        if (!pc || !pc.value.trim()) { alert('Indica el precio de COMPRA del SKU ' + (n+1)); return false; }
+        var pcNum = pc ? parseFloat(pc.value) : NaN;
+        if (!pc || !pc.value || isNaN(pcNum) || pcNum <= 0) {
+          alert('Ingresa un precio de COMPRA valido (solo numero, mayor a 0) para el SKU ' + (n+1));
+          if (pc) pc.focus();
+          return false;
+        }
         var pv = ge('cg' + i + 'v' + n);
-        if (!pv || !pv.value.trim()) { alert('Indica el precio de VENTA del SKU ' + (n+1)); return false; }
+        var pvNum = pv ? parseFloat(pv.value) : NaN;
+        if (!pv || !pv.value || isNaN(pvNum) || pvNum <= 0) {
+          alert('Ingresa un precio de VENTA valido (solo numero, mayor a 0) para el SKU ' + (n+1));
+          if (pv) pv.focus();
+          return false;
+        }
       }
     }
   }
@@ -1428,9 +1443,27 @@ function procesarFilasEquipo(filas) {
     var idr = String(f[0]);
     if (!porUser[u]) porUser[u] = {};
     if (!porUser[u][idr]) {
-      porUser[u][idr] = {pdv: f[8], hora: f[3], pedido: String(f[16]) === 'SI', total: 0, causal: f[25] || ''};
+      porUser[u][idr] = {
+        id: idr,
+        pdv: f[8],
+        hora: f[3],
+        fecha: f[2],
+        pedido: String(f[16]) === 'SI',
+        total: 0,
+        causal: f[25] || '',
+        causalDet: f[26] || '',
+        obs: f[27] || '',
+        items: []   // SKUs vendidos
+      };
     }
-    if (String(f[16]) === 'SI') porUser[u][idr].total = parseFloat(f[24]) || porUser[u][idr].total;
+    if (String(f[16]) === 'SI') {
+      porUser[u][idr].total = parseFloat(f[24]) || porUser[u][idr].total;
+      porUser[u][idr].items.push({
+        e: f[17], n: f[18], m: f[19],
+        qty: parseInt(f[20], 10) || 0,
+        price: parseFloat(f[22]) || 0
+      });
+    }
   }
   for (var u in porUser) {
     var regs = porUser[u];
@@ -1513,6 +1546,7 @@ function renderProms(filter) {
 
 function showDet(u) {
   var d = _supData[u] || {tot: 0, v: 0, cv: 0, n: 0, ef: 0, visitas: []};
+  _detUserActual = u; // para los handlers de borrar/editar
   var t1 = ge('det-titulo'); if (t1) t1.textContent = u;
   var t2 = ge('det-sub');    if (t2) t2.textContent = (DIST_MAP[u] || [])[0] || '-';
   var t3 = ge('det-tot');    if (t3) t3.textContent = 'S/ ' + fmt(d.tot);
@@ -1529,13 +1563,137 @@ function showDet(u) {
       var html = '';
       for (var i = 0; i < d.visitas.length; i++) {
         var v = d.visitas[i];
-        html += '<div class="det-visit"><div><p class="dv-nm">' + v.pdv + '</p><p class="dv-dt">' + v.hora + '</p></div>';
-        html += '<span class="tag ' + (v.pedido ? 'tg-green' : 'tg-amber') + '">' + (v.pedido ? 'S/ ' + fmt(v.total) : (v.causal || 'Sin pedido')) + '</span></div>';
+        html += '<div class="det-visit" style="flex-direction:column;align-items:stretch;gap:8px;padding:12px 14px">';
+        html += '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px">';
+        html += '<div style="flex:1;min-width:0"><p class="dv-nm">' + v.pdv + '</p><p class="dv-dt">' + (v.hora || '--:--') + '</p></div>';
+        html += '<span class="tag ' + (v.pedido ? 'tg-green' : 'tg-amber') + '">' + (v.pedido ? 'S/ ' + fmt(v.total) : 'Sin pedido') + '</span>';
+        html += '</div>';
+        if (!v.pedido && v.causal) {
+          html += '<p style="font-size:12px;color:var(--red);font-weight:500">\u26a0\ufe0f ' + v.causal + '</p>';
+          if (v.causalDet) html += '<p style="font-size:11px;color:var(--t2);background:var(--amber-l);border-radius:6px;padding:6px 8px">' + v.causalDet + '</p>';
+        }
+        if (v.pedido && v.items && v.items.length) {
+          html += '<div style="background:#F8FAFC;border-radius:8px;padding:8px 10px;font-size:11px;color:var(--t2)">';
+          for (var j = 0; j < v.items.length; j++) {
+            var it = v.items[j];
+            html += '<p style="margin-bottom:2px">\u2022 ' + it.n + ' \u2014 ' + it.qty + ' UND \u00d7 S/ ' + fmt(it.price) + ' = S/ ' + fmt(it.qty * it.price) + '</p>';
+          }
+          html += '</div>';
+        }
+        if (v.obs) html += '<p style="font-size:11px;color:var(--t2);font-style:italic">\ud83d\udcac ' + v.obs + '</p>';
+        html += '<div style="display:flex;gap:8px;margin-top:4px">';
+        html += '<button class="btn-xs btn-del" onclick="supBorrarRelevo(\'' + v.id + '\',\'' + u + '\')">\ud83d\uddd1 Eliminar</button>';
+        html += '<button class="btn-xs" style="background:#DBEAFE;color:#1E40AF" onclick="supEditarRelevo(\'' + v.id + '\',\'' + u + '\')">\u270f\ufe0f Editar precio/cantidad</button>';
+        html += '</div>';
+        html += '</div>';
       }
       dv.innerHTML = html;
     }
   }
   G('s-sup-det');
+}
+
+var _detUserActual = '';
+
+function supBorrarRelevo(idr, user) {
+  if (!confirm('\u00bfBorrar este relevo de ' + user + '?\n\nEsto eliminara TODAS las filas de este relevo en el Google Sheets.\nEsta accion no se puede deshacer.')) return;
+  // Borrar en Google Sheets via GAS
+  gasPost({accion: 'BORRAR', id: String(idr)}, function(ok) {
+    if (ok) {
+      alert('\u2713 Relevo eliminado correctamente del Google Sheets');
+      // Recargar datos del equipo
+      cargarDataEquipo();
+      // Refrescar la pantalla actual
+      setTimeout(function() { showDet(user); }, 800);
+    } else {
+      alert('\u26a0\ufe0f No se pudo eliminar. Verifica tu conexion e intenta de nuevo.');
+    }
+  });
+}
+
+function supEditarRelevo(idr, user) {
+  // Buscar la visita en _supData
+  var d = _supData[user];
+  if (!d) return;
+  var visita = null;
+  for (var i = 0; i < d.visitas.length; i++) {
+    if (String(d.visitas[i].id) === String(idr)) { visita = d.visitas[i]; break; }
+  }
+  if (!visita) { alert('No se encontro el relevo'); return; }
+  if (!visita.pedido) {
+    alert('Solo se pueden editar relevos CON pedido. Para "Sin pedido" usa Eliminar y la promotora lo registra de nuevo.');
+    return;
+  }
+  // Abrir modal de edicion con sus SKUs
+  _editandoRelevo = {id: idr, user: user, items: JSON.parse(JSON.stringify(visita.items || [])), pdv: visita.pdv};
+  renderEditModal();
+  openModal('m-edit-relevo');
+}
+
+var _editandoRelevo = null;
+
+function renderEditModal() {
+  if (!_editandoRelevo) return;
+  var tit = ge('edit-titulo');
+  if (tit) tit.textContent = _editandoRelevo.pdv + ' \u00b7 ' + _editandoRelevo.user;
+  var body = ge('edit-body');
+  if (!body) return;
+  var html = '';
+  if (!_editandoRelevo.items.length) {
+    html = '<p style="text-align:center;color:var(--t3);padding:20px">Sin productos para editar</p>';
+  } else {
+    for (var i = 0; i < _editandoRelevo.items.length; i++) {
+      var it = _editandoRelevo.items[i];
+      html += '<div style="background:#F8FAFC;border-radius:10px;padding:11px;margin-bottom:9px">';
+      html += '<p style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:8px">' + it.n + '</p>';
+      html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
+      html += '<div><label class="lbl" style="font-size:10px">Cantidad</label>';
+      html += '<input id="edit-qty-' + i + '" class="inp" type="number" min="1" step="1" inputmode="numeric" value="' + it.qty + '" style="height:40px"/></div>';
+      html += '<div><label class="lbl" style="font-size:10px">Precio UND S/</label>';
+      html += '<input id="edit-price-' + i + '" class="inp" type="number" min="0" step="0.01" inputmode="decimal" value="' + it.price + '" style="height:40px"/></div>';
+      html += '</div></div>';
+    }
+  }
+  body.innerHTML = html;
+}
+
+function guardarEdicionRelevo() {
+  if (!_editandoRelevo) return;
+  // Leer valores editados
+  var items = _editandoRelevo.items;
+  var total = 0;
+  for (var i = 0; i < items.length; i++) {
+    var qe = ge('edit-qty-' + i);
+    var pe = ge('edit-price-' + i);
+    var q = qe ? parseInt(qe.value, 10) : items[i].qty;
+    var p = pe ? parseFloat(pe.value) : items[i].price;
+    if (isNaN(q) || q < 1) { alert('Cantidad invalida en SKU ' + (i+1)); return; }
+    if (isNaN(p) || p < 0) { alert('Precio invalido en SKU ' + (i+1)); return; }
+    items[i].qty = q;
+    items[i].price = p;
+    total += q * p;
+  }
+  // Enviar al GAS: accion ACTUALIZAR con los nuevos items
+  var payload = {
+    accion: 'ACTUALIZAR',
+    id: String(_editandoRelevo.id),
+    items: items,
+    total: total
+  };
+  closeModal('m-edit-relevo');
+  // Confirmar antes
+  if (!confirm('Guardar cambios en Google Sheets?\n\nNuevo total: S/ ' + fmt(total))) return;
+  gasPost(payload, function(ok) {
+    if (ok) {
+      alert('\u2713 Cambios guardados correctamente');
+      var u = _editandoRelevo.user;
+      _editandoRelevo = null;
+      cargarDataEquipo();
+      setTimeout(function() { showDet(u); }, 800);
+    } else {
+      alert('\u26a0\ufe0f No se pudieron guardar los cambios. Verifica tu conexion.');
+    }
+  });
 }
 
 function toggleDatePicker() {

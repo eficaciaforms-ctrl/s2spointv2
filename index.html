@@ -848,6 +848,21 @@ html,body{height:100%;overflow:hidden;background:var(--dark);font-family:-apple-
   </div>
 </div>
 
+<!-- ══════ MODAL: EDITAR RELEVO (SUPERVISOR) ══════ -->
+<div class="modal" id="m-edit-relevo">
+  <div class="modal-sheet">
+    <div class="m-handle"></div>
+    <p style="font-size:17px;font-weight:700;color:var(--text);margin-bottom:4px">✏️ Editar pedido</p>
+    <p style="font-size:13px;color:var(--t2);margin-bottom:6px" id="edit-titulo"></p>
+    <p style="font-size:12px;color:var(--amber);background:var(--amber-l);border-radius:8px;padding:8px 10px;margin-bottom:14px">Los cambios se actualizan directo en Google Sheets</p>
+    <div id="edit-body"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px">
+      <button class="btn btn-white btn-sm" type="button" onclick="closeModal('m-edit-relevo')">Cancelar</button>
+      <button class="btn btn-dark btn-sm" type="button" onclick="guardarEdicionRelevo()">✓ Guardar</button>
+    </div>
+  </div>
+</div>
+
 <!-- ══════ MODAL: ALERTA ══════ -->
 <div class="modal" id="m-alerta">
   <div class="modal-sheet">
