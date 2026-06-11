@@ -685,15 +685,9 @@ function remSKU(i)  { REL_PEDIDO.splice(i, 1); renderPedido(); }
 
 // ─── CAUSALES ────────────────────────────────────────────
 function renderCausales() {
-  // Fill the dropdown once with all causales
-  var sel = ge('caus-sel');
-  if (!sel) return;
-  if (sel.options.length > 1) return; // ya esta poblado
-  var html = '<option value="">— Seleccionar motivo —</option>';
-  for (var i = 0; i < CAUSALES.length; i++) {
-    html += '<option value="' + i + '">' + CAUSALES[i].t + '</option>';
-  }
-  sel.innerHTML = html;
+  // El dropdown ya esta poblado directamente en el HTML.
+  // Esta funcion existe solo para compatibilidad con setModo.
+  return;
 }
 
 function onCausalChange(val) {
@@ -739,21 +733,24 @@ function buildCausalDet(i, c) {
   h += '<div class="ci-det-ttl">\u26a0 INFORMACION OBLIGATORIA</div>';
 
   if (c.tipo === 'stock') {
-    h += '<p class="ci-lbl">\u00bfQUE SKU TIENE EN STOCK? (hasta 3)</p>';
+    h += '<p class="ci-lbl">\u00bfQUE SKUs TIENE EN STOCK? (hasta 3) <span class="req">*</span></p>';
+    h += '<p style="font-size:11px;color:var(--t3);margin-bottom:10px">Por cada SKU completa unidades y precio de venta</p>';
     for (var n = 0; n < 3; n++) {
-      h += '<div class="sku-row">';
+      h += '<div style="background:#fff;border:1.5px solid #93C5FD;border-radius:10px;padding:11px;margin-bottom:10px">';
+      h += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:9px">';
       h += '<div class="sku-num">' + (n + 1) + '</div>';
       h += '<select id="cs' + i + 's' + n + '" class="ci-sel" style="margin-bottom:0;flex:1">' + catOpts + '</select>';
       h += '</div>';
+      h += '<label class="ci-lbl" style="font-size:11px">Unidades aprox</label>';
+      h += '<div class="qty-wrap" style="margin-bottom:8px">';
+      h += '<button class="qbtn" onclick="qMinus(\'cs' + i + 'q' + n + '\')">\u2212</button>';
+      h += '<input id="cs' + i + 'q' + n + '" value="1" class="qty-inp" inputmode="numeric"/>';
+      h += '<button class="qbtn" onclick="qPlus(\'cs' + i + 'q' + n + '\')">+</button>';
+      h += '<span class="qty-lbl">UNIDADES</span></div>';
+      h += '<label class="ci-lbl" style="font-size:11px">Precio venta (UND o DOC mayorista)</label>';
+      h += '<input id="cs' + i + 'p' + n + '" class="ci-inp" style="margin-bottom:0" placeholder="Ej. S/ 1.80 x UND"/>';
+      h += '</div>';
     }
-    h += '<label class="ci-lbl mt8">\u00bfCUANTAS UNIDADES TIENE APROX? <span class="req">*</span></label>';
-    h += '<div class="qty-wrap">';
-    h += '<button class="qbtn" onclick="qMinus(\'csq' + i + '\')">\u2212</button>';
-    h += '<input id="csq' + i + '" value="1" class="qty-inp" inputmode="numeric"/>';
-    h += '<button class="qbtn" onclick="qPlus(\'csq' + i + '\')">+</button>';
-    h += '<span class="qty-lbl">UNIDADES</span></div>';
-    h += '<label class="ci-lbl mt8">\u00bfA CUANTO VENDE LA UNIDAD O DOC (MAYORISTA)? <span class="req">*</span></label>';
-    h += '<input id="csp' + i + '" class="ci-inp" placeholder="Ej. S/ 1.80 x UND o S/ 18 x DOC"/>';
   }
 
   else if (c.tipo === 'precio') {
@@ -764,22 +761,25 @@ function buildCausalDet(i, c) {
   }
 
   else if (c.tipo === 'margen') {
-    h += '<p class="ci-lbl">\u00bfQUE SKU TIENE EN STOCK? (hasta 3)</p>';
+    h += '<p class="ci-lbl">\u00bfQUE SKUs TIENE EN STOCK? (hasta 3) <span class="req">*</span></p>';
+    h += '<p style="font-size:11px;color:var(--t3);margin-bottom:10px">Por cada SKU completa precio de compra y de venta</p>';
     for (var n = 0; n < 3; n++) {
-      h += '<div class="sku-row">';
+      h += '<div style="background:#fff;border:1.5px solid #93C5FD;border-radius:10px;padding:11px;margin-bottom:10px">';
+      h += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:9px">';
       h += '<div class="sku-num">' + (n + 1) + '</div>';
       h += '<select id="cg' + i + 's' + n + '" class="ci-sel" style="margin-bottom:0;flex:1">' + catOpts + '</select>';
+      h += '</div>';
+      h += '<label class="ci-lbl" style="font-size:11px">Precio compra</label>';
+      h += '<input id="cg' + i + 'c' + n + '" class="ci-inp" style="margin-bottom:8px" placeholder="Ej. S/ 1.20 x UND"/>';
+      h += '<label class="ci-lbl" style="font-size:11px">Precio venta (mayorista)</label>';
+      h += '<input id="cg' + i + 'v' + n + '" class="ci-inp" style="margin-bottom:0" placeholder="Ej. S/ 1.50 x UND"/>';
       h += '</div>';
     }
     h += '<label class="ci-lbl mt8">\u00bfA QUE DISTRIBUIDORA LE COMPRA? <span class="req">*</span></label>';
     var dOpts = '<option value="">Seleccionar distribuidora</option>';
     for (var d = 0; d < distUser.length; d++) dOpts += '<option>' + distUser[d] + '</option>';
     dOpts += '<option>OTRA DISTRIBUIDORA</option>';
-    h += '<select id="cgd' + i + '" class="ci-sel">' + dOpts + '</select>';
-    h += '<label class="ci-lbl mt8">\u00bfA CUANTO LO COMPRA? <span class="req">*</span></label>';
-    h += '<input id="cgc' + i + '" class="ci-inp" placeholder="Ej. S/ 1.20 x UND"/>';
-    h += '<label class="ci-lbl mt8">\u00bfA CUANTO LO VENDE (MAYORISTA)? <span class="req">*</span></label>';
-    h += '<input id="cgv' + i + '" class="ci-inp" placeholder="Ej. S/ 1.50 x UND"/>';
+    h += '<select id="cgd' + i + '" class="ci-sel" style="margin-bottom:0">' + dOpts + '</select>';
   }
 
   else if (c.tipo === 'calidad') {
@@ -790,14 +790,22 @@ function buildCausalDet(i, c) {
   }
 
   else if (c.tipo === 'diststock') {
-    h += '<label class="ci-lbl">\u00bfQUE PRODUCTO DESEA EL PDV? <span class="req">*</span></label>';
-    h += '<select id="cds' + i + 'sku" class="ci-sel">' + catOpts + '</select>';
-    h += '<label class="ci-lbl mt8">\u00bfQUE CANTIDAD DESEA? <span class="req">*</span></label>';
-    h += '<div class="qty-wrap">';
-    h += '<button class="qbtn" onclick="qMinus(\'cds' + i + 'qty\')">\u2212</button>';
-    h += '<input id="cds' + i + 'qty" value="1" class="qty-inp" inputmode="numeric"/>';
-    h += '<button class="qbtn" onclick="qPlus(\'cds' + i + 'qty\')">+</button>';
-    h += '<span class="qty-lbl">UNIDADES</span></div>';
+    h += '<p class="ci-lbl">\u00bfQUE PRODUCTOS DESEA EL PDV? (hasta 6) <span class="req">*</span></p>';
+    h += '<p style="font-size:11px;color:var(--t3);margin-bottom:10px">Selecciona los SKUs e indica la cantidad de cada uno</p>';
+    for (var n = 0; n < 6; n++) {
+      h += '<div style="background:#fff;border:1.5px solid #93C5FD;border-radius:10px;padding:11px;margin-bottom:10px">';
+      h += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:9px">';
+      h += '<div class="sku-num">' + (n + 1) + '</div>';
+      h += '<select id="cds' + i + 'sku' + n + '" class="ci-sel" style="margin-bottom:0;flex:1">' + catOpts + '</select>';
+      h += '</div>';
+      h += '<label class="ci-lbl" style="font-size:11px">Cantidad deseada</label>';
+      h += '<div class="qty-wrap" style="margin-bottom:0">';
+      h += '<button class="qbtn" onclick="qMinus(\'cds' + i + 'qty' + n + '\')">\u2212</button>';
+      h += '<input id="cds' + i + 'qty' + n + '" value="1" class="qty-inp" inputmode="numeric"/>';
+      h += '<button class="qbtn" onclick="qPlus(\'cds' + i + 'qty' + n + '\')">+</button>';
+      h += '<span class="qty-lbl">UNIDADES</span></div>';
+      h += '</div>';
+    }
   }
 
   else if (c.tipo === 'vendedor') {
@@ -829,37 +837,59 @@ function getCausalDet() {
   var el;
 
   if (c.tipo === 'stock') {
-    var skus = [];
+    var lineas = [];
     for (var n = 0; n < 3; n++) {
-      el = ge('cs' + i + 's' + n);
-      if (el && el.value) skus.push(skuNombre(el.value));
+      var sk = ge('cs' + i + 's' + n);
+      if (!sk || !sk.value) continue;
+      var nm = skuNombre(sk.value);
+      var qt = ge('cs' + i + 'q' + n);
+      var pr = ge('cs' + i + 'p' + n);
+      var linea = nm;
+      if (qt && qt.value) linea += ' (' + qt.value + ' UND';
+      if (pr && pr.value) linea += (qt && qt.value ? ', ' : ' (') + pr.value;
+      if (qt && qt.value || pr && pr.value) linea += ')';
+      lineas.push(linea);
     }
-    if (skus.length) parts.push('SKUs: ' + skus.join(', '));
-    el = ge('csq' + i); if (el && el.value) parts.push('Cant: ' + el.value + ' UND');
-    el = ge('csp' + i); if (el && el.value) parts.push('Precio venta: ' + el.value);
+    if (lineas.length) parts.push('SKUs: ' + lineas.join(' | '));
   }
   else if (c.tipo === 'precio') {
     el = ge('cpm' + i); if (el && el.value) parts.push('Marca: ' + el.value);
     el = ge('cpp' + i); if (el && el.value) parts.push('Precio: ' + el.value);
   }
   else if (c.tipo === 'margen') {
-    var skus2 = [];
+    var lineas2 = [];
     for (var n = 0; n < 3; n++) {
-      el = ge('cg' + i + 's' + n);
-      if (el && el.value) skus2.push(skuNombre(el.value));
+      var sk2 = ge('cg' + i + 's' + n);
+      if (!sk2 || !sk2.value) continue;
+      var nm2 = skuNombre(sk2.value);
+      var pc = ge('cg' + i + 'c' + n);
+      var pv = ge('cg' + i + 'v' + n);
+      var linea2 = nm2;
+      var extras = [];
+      if (pc && pc.value) extras.push('compra ' + pc.value);
+      if (pv && pv.value) extras.push('venta ' + pv.value);
+      if (extras.length) linea2 += ' (' + extras.join(', ') + ')';
+      lineas2.push(linea2);
     }
-    if (skus2.length) parts.push('SKUs: ' + skus2.join(', '));
+    if (lineas2.length) parts.push('SKUs: ' + lineas2.join(' | '));
     el = ge('cgd' + i); if (el && el.value) parts.push('Dist compra: ' + el.value);
-    el = ge('cgc' + i); if (el && el.value) parts.push('Compra: ' + el.value);
-    el = ge('cgv' + i); if (el && el.value) parts.push('Venta: ' + el.value);
   }
   else if (c.tipo === 'calidad') {
     el = ge('cca' + i); if (el && el.value) parts.push('Producto: ' + skuNombre(el.value));
     el = ge('ccc' + i); if (el && el.value) parts.push('Comentario: ' + el.value);
   }
   else if (c.tipo === 'diststock') {
-    el = ge('cds' + i + 'sku'); if (el && el.value) parts.push('Producto deseado: ' + skuNombre(el.value));
-    el = ge('cds' + i + 'qty'); if (el && el.value) parts.push('Cantidad: ' + el.value + ' UND');
+    var lineas3 = [];
+    for (var n = 0; n < 6; n++) {
+      var sk3 = ge('cds' + i + 'sku' + n);
+      if (!sk3 || !sk3.value) continue;
+      var nm3 = skuNombre(sk3.value);
+      var qt3 = ge('cds' + i + 'qty' + n);
+      var linea3 = nm3;
+      if (qt3 && qt3.value) linea3 += ' (' + qt3.value + ' UND)';
+      lineas3.push(linea3);
+    }
+    if (lineas3.length) parts.push('Productos deseados: ' + lineas3.join(' | '));
   }
   else if (c.tipo === 'vendedor') {
     el = ge('cvd' + i); if (el && el.value) parts.push('Distribuidora que visito antes: ' + el.value);
@@ -876,7 +906,14 @@ function validarCausal() {
 
   if (c.tipo === 'stock') {
     el = ge('cs' + i + 's0'); if (!el || !el.value) { alert('Selecciona al menos 1 SKU que tiene en stock'); return false; }
-    el = ge('csp' + i);       if (!el || !el.value.trim()) { alert('Indica a cuanto vende la unidad o doc'); return false; }
+    // Para cada SKU seleccionado, exigir precio venta
+    for (var n = 0; n < 3; n++) {
+      var sk = ge('cs' + i + 's' + n);
+      if (sk && sk.value) {
+        var pr = ge('cs' + i + 'p' + n);
+        if (!pr || !pr.value.trim()) { alert('Completa el precio de venta del SKU ' + (n+1)); return false; }
+      }
+    }
   }
   if (c.tipo === 'precio') {
     el = ge('cpm' + i); if (!el || !el.value.trim()) { alert('Indica la marca competidora'); return false; }
@@ -885,15 +922,23 @@ function validarCausal() {
   if (c.tipo === 'margen') {
     el = ge('cg' + i + 's0'); if (!el || !el.value) { alert('Selecciona al menos 1 SKU en stock'); return false; }
     el = ge('cgd' + i);        if (!el || !el.value) { alert('Selecciona la distribuidora a la que le compra'); return false; }
-    el = ge('cgc' + i);        if (!el || !el.value.trim()) { alert('Indica a cuanto lo compra'); return false; }
-    el = ge('cgv' + i);        if (!el || !el.value.trim()) { alert('Indica a cuanto lo vende'); return false; }
+    // Para cada SKU seleccionado, exigir compra y venta
+    for (var n = 0; n < 3; n++) {
+      var sk2 = ge('cg' + i + 's' + n);
+      if (sk2 && sk2.value) {
+        var pc = ge('cg' + i + 'c' + n);
+        if (!pc || !pc.value.trim()) { alert('Indica el precio de COMPRA del SKU ' + (n+1)); return false; }
+        var pv = ge('cg' + i + 'v' + n);
+        if (!pv || !pv.value.trim()) { alert('Indica el precio de VENTA del SKU ' + (n+1)); return false; }
+      }
+    }
   }
   if (c.tipo === 'calidad') {
     el = ge('cca' + i); if (!el || !el.value)        { alert('Selecciona el producto'); return false; }
     el = ge('ccc' + i); if (!el || !el.value.trim()) { alert('Detalla el comentario del cliente'); return false; }
   }
   if (c.tipo === 'diststock') {
-    el = ge('cds' + i + 'sku'); if (!el || !el.value) { alert('Selecciona el producto que desea el PDV'); return false; }
+    el = ge('cds' + i + 'sku0'); if (!el || !el.value) { alert('Selecciona al menos 1 producto que desea el PDV'); return false; }
   }
   if (c.tipo === 'vendedor') {
     el = ge('cvd' + i); if (!el || !el.value) { alert('Selecciona la distribuidora que visito el PDV antes'); return false; }
