@@ -1,5 +1,5 @@
 // S2S Point — Service Worker
-var CACHE_VER  = 's2s-v8-2026-06-11-2056';
+var CACHE_VER  = 's2s-v9-2026-06-11-2108';
 var CACHE_NAME = 's2spoint-' + CACHE_VER;
 var URLS = ['./','./index.html','./app.js','./config.js','./manifest.json','./icon-192.png','./icon-512.png','./manual_promotor.html','./manual_supervisor.html'];
 
