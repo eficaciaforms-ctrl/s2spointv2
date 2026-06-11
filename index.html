@@ -610,7 +610,13 @@ html,body{height:100%;overflow:hidden;background:var(--dark);font-family:-apple-
     <!-- CAUSALES -->
     <div id="p-no" class="sec" style="display:none">
       <div class="sec-hdr"><div class="sec-ico ic-red">⚠</div><div><div class="sec-ttl">Causal de no venta</div><div class="sec-sub">Selecciona el motivo exacto</div></div></div>
-      <div class="sec-body" id="caus-body"></div>
+      <div class="sec-body">
+        <label class="lbl">Motivo de no venta <span class="req">*</span></label>
+        <select class="sel" id="caus-sel" onchange="onCausalChange(this.value)">
+          <option value="">— Seleccionar motivo —</option>
+        </select>
+        <div id="caus-detail" style="display:none;margin-top:14px"></div>
+      </div>
     </div>
     <!-- OBSERVACIONES -->
     <div class="sec">

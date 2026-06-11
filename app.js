@@ -601,7 +601,11 @@ function setModo(m) {
   var tn = ge('tog-no'); if (tn) tn.className = 'tog' + (m === 'no' ? ' no' : '');
   var pp = ge('p-prod'); if (pp) pp.style.display = m === 'si' ? 'block' : 'none';
   var pn = ge('p-no');   if (pn) pn.style.display = m === 'no' ? 'block' : 'none';
-  if (m === 'no') renderCausales();
+  if (m === 'no') {
+    renderCausales();
+    var cs = ge('caus-sel'); if (cs) cs.value = '';
+    var cd = ge('caus-detail'); if (cd) { cd.innerHTML = ''; cd.style.display = 'none'; }
+  }
 }
 
 // ─── BUSQUEDA SKU (pedido) ───────────────────────────────
@@ -681,33 +685,47 @@ function remSKU(i)  { REL_PEDIDO.splice(i, 1); renderPedido(); }
 
 // ─── CAUSALES ────────────────────────────────────────────
 function renderCausales() {
-  var body = ge('caus-body');
-  if (!body) return;
-  var html = '';
+  // Fill the dropdown once with all causales
+  var sel = ge('caus-sel');
+  if (!sel) return;
+  if (sel.options.length > 1) return; // ya esta poblado
+  var html = '<option value="">— Seleccionar motivo —</option>';
   for (var i = 0; i < CAUSALES.length; i++) {
-    var c = CAUSALES[i];
-    var sel = REL_CAUSAL === i;
-    html += '<div class="ci' + (sel ? ' sel' : '') + '" id="ci-' + i + '">';
-    html += '<div class="ci-row" onclick="selC(' + i + ')">';
-    html += '<div class="ci-radio"><div class="ci-dot"></div></div>';
-    html += '<div class="ci-txt">' + c.t + '</div>';
-    html += '</div>';
-    if (sel && c.tipo !== 'simple') html += buildCausalDet(i, c);
-    html += '</div>';
+    html += '<option value="' + i + '">' + CAUSALES[i].t + '</option>';
   }
-  body.innerHTML = html;
+  sel.innerHTML = html;
 }
 
-function selC(i) {
-  REL_CAUSAL = (REL_CAUSAL === i) ? null : i;
-  renderCausales();
-  if (REL_CAUSAL !== null) {
-    setTimeout(function() {
-      var el = ge('ci-' + REL_CAUSAL);
-      if (el && el.scrollIntoView) el.scrollIntoView({behavior: 'smooth', block: 'nearest'});
-    }, 100);
+function onCausalChange(val) {
+  var det = ge('caus-detail');
+  if (val === '' || val === null || val === undefined) {
+    REL_CAUSAL = null;
+    if (det) { det.innerHTML = ''; det.style.display = 'none'; }
+    return;
   }
+  var idx = parseInt(val, 10);
+  REL_CAUSAL = idx;
+  var c = CAUSALES[idx];
+  if (!det) return;
+  if (!c || c.tipo === 'simple') {
+    det.innerHTML = '';
+    det.style.display = 'none';
+    return;
+  }
+  det.innerHTML = buildCausalDet(idx, c);
+  det.style.display = 'block';
+  // Scroll para que se vea el detalle
+  setTimeout(function() {
+    if (det.scrollIntoView) det.scrollIntoView({behavior: 'smooth', block: 'nearest'});
+  }, 100);
 }
+
+// Funcion legacy mantenida por compatibilidad (no se usa con el nuevo dropdown)
+function selC(i) {
+  var sel = ge('caus-sel');
+  if (sel) { sel.value = String(i); onCausalChange(String(i)); }
+}
+
 
 function buildCausalDet(i, c) {
   var distGen  = (typeof DIST_GENERALES !== 'undefined') ? DIST_GENERALES : [];
@@ -979,6 +997,8 @@ function confirmarRelevo() {
 
 function resetRelevo() {
   REL_PDV = null; REL_PEDIDO = []; REL_CAUSAL = null; REL_MODO = 'si'; REL_NP = false;
+  var cs = ge('caus-sel'); if (cs) cs.value = '';
+  var cd = ge('caus-detail'); if (cd) { cd.innerHTML = ''; cd.style.display = 'none'; }
   var ids = ['pdv-inp', 'f-giro', 'f-sub', 'f-ruc', 'f-obs', 'sku-inp', 'np-nm', 'np-dir'];
   for (var i = 0; i < ids.length; i++) { var el = ge(ids[i]); if (el) el.value = ''; }
   var hideIds = ['pdv-sel', 'pdv-drop', 'np-panel', 'sku-drop'];
