@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
+<title>Manual Supervisor — S2S Point</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
+:root{--blue:#2563EB;--dark:#0F172A;--green:#059669;--red:#DC2626;--amber:#D97706;--text:#1E293B;--t2:#64748B;--t3:#94A3B8;--border:#E2E8F0;--bg:#F1F5F9;--purple:#7C3AED}
+body{font-family:-apple-system,system-ui,sans-serif;background:var(--bg);color:var(--text)}
+.hdr{background:var(--purple);padding:20px 20px 40px;text-align:center}
+.hdr-logo{font-size:48px;margin-bottom:10px}
+.hdr-title{color:#fff;font-size:22px;font-weight:700;letter-spacing:-.3px}
+.hdr-sub{color:rgba(255,255,255,.5);font-size:13px;margin-top:4px}
+.nav{background:#fff;border-bottom:1px solid var(--border);padding:0 16px;display:flex;gap:0;overflow-x:auto;-webkit-overflow-scrolling:touch;position:sticky;top:0;z-index:10}
+.nav::-webkit-scrollbar{display:none}
+.nav-btn{height:44px;padding:0 16px;border:none;background:none;font-size:13px;font-weight:500;color:var(--t2);white-space:nowrap;cursor:pointer;border-bottom:2px solid transparent;font-family:inherit;flex-shrink:0}
+.nav-btn.on{color:var(--purple);border-bottom-color:var(--purple);font-weight:600}
+.section{display:none;padding:16px}.section.on{display:block}
+.card{background:#fff;border-radius:14px;border:.5px solid var(--border);margin-bottom:12px;overflow:hidden}
+.card-hdr{padding:14px 16px;display:flex;align-items:center;gap:10px;cursor:pointer}
+.card-ico{font-size:24px;flex-shrink:0}
+.card-ttl{font-size:15px;font-weight:600;color:var(--text);flex:1}
+.card-arr{font-size:18px;color:var(--t3);transition:transform .2s}
+.card.open .card-arr{transform:rotate(90deg)}
+.card-body{display:none;padding:0 16px 14px;border-top:.5px solid var(--border)}
+.card.open .card-body{display:block}
+.step{display:flex;gap:12px;margin-bottom:16px;padding-top:14px}
+.step-n{width:28px;height:28px;border-radius:50%;background:var(--purple);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.step-content .ttl{font-size:15px;font-weight:600;color:var(--text);margin-bottom:5px}
+.step-content .txt{font-size:14px;color:var(--t2);line-height:1.7}
+.tip{background:#FFFBEB;border:1px solid #FDE68A;border-radius:10px;padding:11px 13px;font-size:13px;color:#92400E;line-height:1.6;margin-top:8px;display:flex;gap:8px}
+.warn{background:#FEF2F2;border:1px solid #FECACA;border-radius:10px;padding:11px 13px;font-size:13px;color:#DC2626;line-height:1.6;margin-top:8px}
+.ok{background:#F0FDF4;border:1px solid #6EE7B7;border-radius:10px;padding:11px 13px;font-size:13px;color:#065F46;line-height:1.6;margin-top:8px}
+.tag{display:inline-flex;font-size:11px;font-weight:500;padding:2px 8px;border-radius:20px}
+.tg-green{background:#D1FAE5;color:#065F46}.tg-red{background:#FEE2E2;color:#991B1B}
+.tg-blue{background:#DBEAFE;color:#1E40AF}.tg-amber{background:#FEF3C7;color:#92400E}
+.tg-purple{background:#EDE9FE;color:#5B21B6}
+.info-row{display:flex;align-items:flex-start;gap:10px;padding:11px;background:#F8FAFC;border-radius:10px;margin-bottom:9px}
+.formula{background:var(--dark);border-radius:12px;padding:14px;margin-top:10px}
+.formula-txt{color:#fff;font-size:13px;text-align:center;font-weight:500;line-height:1.8}
+.formula-ttl{color:rgba(255,255,255,.5);font-size:11px;text-transform:uppercase;letter-spacing:.6px;text-align:center;margin-bottom:4px}
+.badge-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:10px}
+.badge{padding:12px;border-radius:11px;text-align:center}
+.badge-ico{font-size:22px;margin-bottom:5px}
+.badge-ttl{font-size:13px;font-weight:600;color:var(--text)}
+.badge-sub{font-size:11px;color:var(--t3);margin-top:2px}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-logo">👔</div>
+  <div class="hdr-title">Manual Supervisor</div>
+  <div class="hdr-sub">S2S Point · Guía completa para supervisores</div>
+</div>
+
+<div class="nav">
+  <button class="nav-btn on" onclick="showSec('s-inicio',this)">Inicio</button>
+  <button class="nav-btn" onclick="showSec('s-login',this)">1. Ingreso</button>
+  <button class="nav-btn" onclick="showSec('s-panel',this)">2. Panel</button>
+  <button class="nav-btn" onclick="showSec('s-equipo',this)">3. Equipo</button>
+  <button class="nav-btn" onclick="showSec('s-detalle',this)">4. Detalle</button>
+  <button class="nav-btn" onclick="showSec('s-apro',this)">5. Aprobaciones</button>
+  <button class="nav-btn" onclick="showSec('s-metricas',this)">6. Métricas</button>
+  <button class="nav-btn" onclick="showSec('s-alertas',this)">7. Alertas</button>
+</div>
+
+<!-- ═══ INICIO ═══ -->
+<div id="s-inicio" class="section on">
+  <div style="background:linear-gradient(135deg,#6D28D9,#7C3AED);border-radius:16px;padding:20px;margin-bottom:16px;text-align:center">
+    <p style="font-size:28px;margin-bottom:8px">👔</p>
+    <p style="color:#fff;font-size:16px;font-weight:600;margin-bottom:6px">Panel de supervisor</p>
+    <p style="color:rgba(255,255,255,.7);font-size:13px;line-height:1.7">Con tu acceso de supervisor puedes monitorear el avance de tu equipo en tiempo real, ver el detalle de cada promotora y aprobar modificaciones.</p>
+  </div>
+  <div class="card">
+    <div style="padding:14px 16px">
+      <p style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:12px">📋 ¿Qué puedes hacer como supervisor?</p>
+      <div style="display:flex;flex-direction:column;gap:9px">
+        <div class="info-row"><span style="font-size:20px">📊</span><div><p style="font-size:13px;font-weight:600;color:var(--text)">Ver avance del equipo en tiempo real</p><p style="font-size:12px;color:var(--t3)">Total en soles, métricas por promotora</p></div></div>
+        <div class="info-row"><span style="font-size:20px">📅</span><div><p style="font-size:13px;font-weight:600;color:var(--text)">Consultar fechas anteriores</p><p style="font-size:12px;color:var(--t3)">Ver cierre de cualquier día pasado</p></div></div>
+        <div class="info-row"><span style="font-size:20px">🔍</span><div><p style="font-size:13px;font-weight:600;color:var(--text)">Ver detalle por promotora</p><p style="font-size:12px;color:var(--t3)">Cada visita del día con monto o causal</p></div></div>
+        <div class="info-row"><span style="font-size:20px">✅</span><div><p style="font-size:13px;font-weight:600;color:var(--text)">Aprobar modificaciones</p><p style="font-size:12px;color:var(--t3)">Revisar cambios solicitados por promotoras</p></div></div>
+        <div class="info-row"><span style="font-size:20px">📖</span><div><p style="font-size:13px;font-weight:600;color:var(--text)">Acceso al manual completo</p><p style="font-size:12px;color:var(--t3)">Manual de promotoras y de supervisores</p></div></div>
+      </div>
+    </div>
+  </div>
+  <div style="background:#EDE9FE;border-radius:12px;padding:13px;border:1px solid #C4B5FD">
+    <p style="font-size:13px;font-weight:600;color:var(--purple);margin-bottom:4px">🔐 Acceso supervisor</p>
+    <p style="font-size:13px;color:#5B21B6;line-height:1.6">Los usuarios de supervisor comienzan con <strong>SUP</strong> (SUPLIMA, SUPAREQUIPA, etc.). La contraseña es <strong>SUPER123$</strong>.<br><br>Con tu acceso puedes ver tanto el manual del promotor como el de supervisor.</p>
+  </div>
+</div>
+
+<!-- ═══ LOGIN ═══ -->
+<div id="s-login" class="section">
+  <div class="step">
+    <div class="step-n">1</div>
+    <div class="step-content">
+      <div class="ttl">Ingresa con tu usuario SUP</div>
+      <div class="txt">Tu usuario comienza con <strong>SUP</strong>. Ejemplos: SUPLIMA, SUPAREQUIPA, SUPHUANCAYO, SUPCHICLAYO, SUPPIURA.<br><br>Contraseña: <strong>SUPER123$</strong></div>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-n">2</div>
+    <div class="step-content">
+      <div class="ttl">Selecciona la fecha</div>
+      <div class="txt">La app carga la fecha de hoy automáticamente. También puedes ingresar con una fecha anterior para ver cómo cerró tu equipo ese día.</div>
+      <div class="warn">⛔ No puedes ingresar con fechas futuras.</div>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-n">3</div>
+    <div class="step-content">
+      <div class="ttl">Confirmar e ingresar</div>
+      <div class="txt">Al confirmar la fecha, accedes directamente al <strong>panel de supervisor</strong> donde ves el avance consolidado de tu equipo.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PANEL ═══ -->
+<div id="s-panel" class="section">
+  <p style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:14px">📊 Panel principal del supervisor</p>
+  <div class="card open" style="margin-bottom:12px">
+    <div class="card-hdr" onclick="toggleCard(this)">
+      <span class="card-ico">💰</span>
+      <span class="card-ttl">Total consolidado del equipo</span>
+      <span class="card-arr">›</span>
+    </div>
+    <div class="card-body">
+      <p style="font-size:14px;color:var(--t2);line-height:1.7;padding-top:12px">En la parte superior del panel verás el <strong>total en soles de todo tu equipo</strong> para la fecha seleccionada, junto con las métricas consolidadas:</p>
+      <div class="badge-grid">
+        <div class="badge" style="background:#F8FAFC;border:.5px solid var(--border)"><div class="badge-ico">🏪</div><div class="badge-ttl">Visitados</div><div class="badge-sub">Total visitas del equipo</div></div>
+        <div class="badge" style="background:#F0FDF4;border:.5px solid #6EE7B7"><div class="badge-ico">✅</div><div class="badge-ttl">Con venta</div><div class="badge-sub">PDVs que compraron</div></div>
+        <div class="badge" style="background:#EFF6FF;border:.5px solid #BFDBFE"><div class="badge-ico">📊</div><div class="badge-ttl">Neto</div><div class="badge-sub">Sin causales externas</div></div>
+        <div class="badge" style="background:#F8FAFC;border:.5px solid var(--border)"><div class="badge-ico">📈</div><div class="badge-ttl">Efectividad</div><div class="badge-sub">Con venta ÷ Neto</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-hdr" onclick="toggleCard(this)">
+      <span class="card-ico">📅</span>
+      <span class="card-ttl">Cambiar fecha de consulta</span>
+      <span class="card-arr">›</span>
+    </div>
+    <div class="card-body">
+      <p style="font-size:14px;color:var(--t2);line-height:1.7;padding-top:12px">Toca el selector de fecha (debajo de tu nombre) para ver el avance de tu equipo en cualquier fecha anterior.</p>
+      <p style="font-size:14px;color:var(--t2);line-height:1.7;margin-top:8px">Se muestran los últimos <strong>7 días disponibles</strong>. No puedes seleccionar fechas futuras.</p>
+      <div class="ok" style="margin-top:10px">📅 <strong>Hoy</strong> aparece marcado con ✓ por defecto. Toca cualquier día pasado para ver cómo cerró tu equipo ese día.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ EQUIPO ═══ -->
+<div id="s-equipo" class="section">
+  <p style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:14px">👥 Vista de tu equipo</p>
+  <div class="card open">
+    <div class="card-hdr" onclick="toggleCard(this)">
+      <span class="card-ico">🔴🟢</span>
+      <span class="card-ttl">Indicadores de estado</span>
+      <span class="card-arr">›</span>
+    </div>
+    <div class="card-body">
+      <p style="font-size:14px;color:var(--t2);line-height:1.7;padding-top:12px">Cada promotora muestra un punto de color indicando su estado:</p>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px">
+        <div style="display:flex;align-items:center;gap:10px;padding:10px;background:#F0FDF4;border-radius:10px">
+          <div style="width:12px;height:12px;border-radius:50%;background:var(--green);flex-shrink:0"></div>
+          <p style="font-size:13px;color:#065F46;font-weight:500">✅ Cierre enviado — completó el día correctamente</p>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px;background:#FEF2F2;border-radius:10px">
+          <div style="width:12px;height:12px;border-radius:50%;background:var(--red);flex-shrink:0"></div>
+          <p style="font-size:13px;color:#991B1B;font-weight:500">⚠️ Cierre pendiente — aún no cerró el día</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-hdr" onclick="toggleCard(this)">
+      <span class="card-ico">🔍</span>
+      <span class="card-ttl">Filtros disponibles</span>
+      <span class="card-arr">›</span>
+    </div>
+    <div class="card-body">
+      <p style="font-size:14px;color:var(--t2);line-height:1.7;padding-top:12px">Usa los chips de filtro para ver solo parte de tu equipo:</p>
+      <div style="display:flex;gap:7px;flex-wrap:wrap;margin-top:10px">
+        <span class="tag" style="background:var(--dark);color:#fff">Todas</span>
+        <span class="tag tg-green">Con cierre</span>
+        <span class="tag tg-red">Sin cierre</span>
+      </div>
+      <p style="font-size:13px;color:var(--t2);margin-top:10px;line-height:1.6">Esto te permite identificar rápidamente qué promotoras aún no han cerrado el día.</p>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-hdr" onclick="toggleCard(this)">
+      <span class="card-ico">📋</span>
+      <span class="card-ttl">Métricas por promotora</span>
+      <span class="card-arr">›</span>
+    </div>
+    <div class="card-body">
+      <p style="font-size:14px;color:var(--t2);line-height:1.7;padding-top:12px">Cada tarjeta de promotora muestra:</p>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-top:8px">
+        <div style="display:flex;justify-content:space-between;padding:8px 11px;background:#F8FAFC;border-radius:8px"><span style="font-size:13px;color:var(--t2)">Monto vendido hoy</span><span class="tag tg-green">S/ X,XXX.XX</span></div>
+        <div style="display:flex;justify-content:space-between;padding:8px 11px;background:#F8FAFC;border-radius:8px"><span style="font-size:13px;color:var(--t2)">Visitas totales</span><span style="font-size:13px;font-weight:600;color:var(--text)">XX</span></div>
+        <div style="display:flex;justify-content:space-between;padding:8px 11px;background:#F8FAFC;border-radius:8px"><span style="font-size:13px;color:var(--t2)">Con venta</span><span style="font-size:13px;font-weight:600;color:var(--green)">XX</span></div>
+        <div style="display:flex;justify-content:space-between;padding:8px 11px;background:#F8FAFC;border-radius:8px"><span style="font-size:13px;color:var(--t2)">Neto visitados</span><span style="font-size:13px;font-weight:600;color:var(--blue)">XX</span></div>
+        <div style="display:flex;justify-content:space-between;padding:8px 11px;background:#F8FAFC;border-radius:8px"><span style="font-size:13px;color:var(--t2)">Efectividad</span><span style="font-size:13px;font-weight:600;color:var(--text)">XX%</span></div>
+      </div>
+      <div class="tip" style="margin-top:10px"><span>💡</span><span>La efectividad se colorea: 🟢 ≥70%, 🟡 55-69%, 🔴 &lt;55%</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ DETALLE ═══ -->
+<div id="s-detalle" class="section">
+  <div class="step">
+    <div class="step-n">1</div>
+    <div class="step-content">
+      <div class="ttl">Toca una promotora</div>
+      <div class="txt">En la vista del equipo, toca la tarjeta de cualquier promotora para ver su detalle del día.</div>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-n">2</div>
+    <div class="step-content">
+      <div class="ttl">Ver métricas individuales</div>
+      <div class="txt">Verás el total vendido en soles grande, más las 4 métricas individuales: visitados, con venta, neto y efectividad.</div>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-n">3</div>
+    <div class="step-content">
+      <div class="ttl">Revisar visitas del día</div>
+      <div class="txt">Más abajo aparece la lista de cada PDV visitado con la hora, si realizó pedido (con monto) o la causal de no venta.</div>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-n">4</div>
+    <div class="step-content">
+      <div class="ttl">Alerta de cierre pendiente</div>
+      <div class="txt">Si la promotora no ha cerrado el día, aparecerá una alerta roja indicando "Cierre pendiente".</div>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-n">5</div>
+    <div class="step-content">
+      <div class="ttl">Cambiar fecha del detalle</div>
+      <div class="txt">Puedes consultar el historial de cualquier promotora en fechas anteriores usando el selector de fecha del panel principal.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ APROBACIONES ═══ -->
+<div id="s-apro" class="section">
+  <div style="background:#EDE9FE;border-radius:12px;padding:13px;border:1px solid #C4B5FD;margin-bottom:14px">
+    <p style="font-size:14px;font-weight:600;color:var(--purple);margin-bottom:4px">⚠️ ¿Cuándo llegan modificaciones?</p>
+    <p style="font-size:13px;color:#5B21B6;line-height:1.6">Cuando una promotora edita un relevo de una <strong>fecha anterior</strong>, la modificación llega a tu módulo de aprobaciones antes de aplicarse en el sistema.</p>
+  </div>
+  <div class="step">
+    <div class="step-n">1</div>
+    <div class="step-content">
+      <div class="ttl">Acceder a Aprobaciones</div>
+      <div class="txt">Toca el ícono de campana 🔔 en la esquina superior derecha de tu pantalla, o el botón <strong>"Aprob."</strong> en la barra inferior.</div>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-n">2</div>
+    <div class="step-content">
+      <div class="ttl">Revisar la modificación</div>
+      <div class="txt">Cada solicitud muestra:<br>• <strong>Usuario</strong> que solicitó el cambio<br>• <strong>PDV</strong> que se quiere modificar<br>• <strong>Fecha</strong> del relevo original<br>• <strong>Antes</strong> vs <strong>Después</strong> del cambio</div>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-n">3</div>
+    <div class="step-content">
+      <div class="ttl">Aprobar o rechazar</div>
+      <div class="txt">Toca:<br>• <strong>✓ Aprobar</strong>: el cambio se aplica en Google Sheets<br>• <strong>✕ Rechazar</strong>: el cambio no se aplica y se notifica a la promotora</div>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-n">4</div>
+    <div class="step-content">
+      <div class="ttl">Aprobar todas</div>
+      <div class="txt">Si quieres aprobar todas las modificaciones pendientes a la vez, toca el botón <strong>"Aprobar todas las modificaciones"</strong> en la parte superior de la lista.</div>
+    </div>
+  </div>
+  <div class="warn">⚠️ Revisa siempre el "Antes" vs "Después" de cada modificación antes de aprobar. Una vez aprobado, el cambio se registra permanentemente.</div>
+</div>
+
+<!-- ═══ MÉTRICAS ═══ -->
+<div id="s-metricas" class="section">
+  <p style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:14px">📊 Cómo interpretar las métricas</p>
+  <div class="card">
+    <div class="card-body" style="display:block;padding:14px 16px">
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="padding:12px;background:#F8FAFC;border-radius:10px">
+          <p style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px">🏪 Visitados totales</p>
+          <p style="font-size:13px;color:var(--t2);line-height:1.6">Todos los PDVs donde la promotora registró una visita, independientemente del resultado.</p>
+        </div>
+        <div style="padding:12px;background:#F0FDF4;border-radius:10px">
+          <p style="font-size:13px;font-weight:700;color:var(--green);margin-bottom:4px">✅ Con venta</p>
+          <p style="font-size:13px;color:var(--t2);line-height:1.6">PDVs donde el cliente realizó un pedido (registrado en el app).</p>
+        </div>
+        <div style="padding:12px;background:var(--blue-l);border-radius:10px">
+          <p style="font-size:13px;font-weight:700;color:var(--blue);margin-bottom:4px">📊 Neto visitados</p>
+          <p style="font-size:13px;color:var(--t2);line-height:1.6">Total visitados <strong>menos</strong> los que tienen causales <strong>externas</strong>.</p>
+          <p style="font-size:12px;color:var(--blue);margin-top:6px;font-weight:500">Causales externas (se restan del neto):</p>
+          <p style="font-size:12px;color:var(--t2);line-height:1.7;">Cerrado · Sin efectivo · No estaba el dueño · Ya visitado por corredor · Ya visitado por otro vendedor · No vende la categoría</p>
+        </div>
+        <div style="padding:12px;background:#F8FAFC;border-radius:10px">
+          <p style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px">📈 Efectividad</p>
+          <p style="font-size:13px;color:var(--t2);line-height:1.6">Porcentaje de visitas "reales" (neto) que terminaron en pedido.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="formula">
+    <div class="formula-ttl">Fórmula de efectividad</div>
+    <div class="formula-txt">Efectividad = Con Venta ÷ Neto Visitados × 100</div>
+  </div>
+  <br>
+  <div style="background:#F8FAFC;border-radius:12px;padding:14px;border:.5px solid var(--border)">
+    <p style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:8px">🎯 Rangos de efectividad</p>
+    <div style="display:flex;flex-direction:column;gap:7px">
+      <div style="display:flex;align-items:center;gap:9px"><div style="width:12px;height:12px;border-radius:50%;background:var(--green)"></div><span class="tag tg-green">≥ 70%</span><span style="font-size:13px;color:var(--t2)">Excelente — Objetivo cumplido</span></div>
+      <div style="display:flex;align-items:center;gap:9px"><div style="width:12px;height:12px;border-radius:50%;background:var(--amber)"></div><span class="tag tg-amber">55% – 69%</span><span style="font-size:13px;color:var(--t2)">Regular — Puede mejorar</span></div>
+      <div style="display:flex;align-items:center;gap:9px"><div style="width:12px;height:12px;border-radius:50%;background:var(--red)"></div><span class="tag tg-red">&lt; 55%</span><span style="font-size:13px;color:var(--t2)">Bajo — Requiere atención</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ ALERTAS ═══ -->
+<div id="s-alertas" class="section">
+  <p style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:14px">🔔 Sistema de alertas</p>
+  <div class="card">
+    <div class="card-body" style="display:block;padding:14px 16px">
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="padding:12px;background:#FFFBEB;border-radius:10px;border:1px solid #FDE68A">
+          <p style="font-size:13px;font-weight:700;color:#92400E;margin-bottom:4px">🕕 5:45 PM — Alerta preventiva a promotoras</p>
+          <p style="font-size:13px;color:#92400E;line-height:1.6">Las promotoras con visitas registradas reciben un aviso recordándoles que se acercan las 6 PM y deben hacer su cierre.</p>
+        </div>
+        <div style="padding:12px;background:#FEF2F2;border-radius:10px;border:1px solid #FECACA">
+          <p style="font-size:13px;font-weight:700;color:#991B1B;margin-bottom:4px">🕕 6:00 PM+ — Alerta de cierre pendiente</p>
+          <p style="font-size:13px;color:#991B1B;line-height:1.6">A las 6 PM y cada hora después, las promotoras sin cierre reciben una alerta urgente mostrando sus estadísticas del día.</p>
+        </div>
+        <div style="padding:12px;background:#F8FAFC;border-radius:10px">
+          <p style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px">📅 Día siguiente sin cierre</p>
+          <p style="font-size:13px;color:var(--t2);line-height:1.6">Si una promotora ingresa al día siguiente sin haber cerrado el día anterior, la app la bloquea y le pide cerrar primero (solo si tiene registros reales del día anterior).</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="tip"><span>💡</span><span>Como supervisor, la campana 🔔 en tu pantalla principal te indica si hay modificaciones pendientes de aprobar de tu equipo.</span></div>
+  <br>
+  <div class="ok">✅ <strong>Buenas prácticas:</strong> Revisa las aprobaciones pendientes al menos una vez al día para no dejar a tus promotoras esperando correcciones en sus registros.</div>
+</div>
+
+<div style="height:40px"></div>
+
+<script>
+function showSec(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('on'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  btn.classList.add('on');
+  btn.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function toggleCard(hdr) {
+  hdr.closest('.card').classList.toggle('open');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
+<title>Manual Promotora — S2S Point</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
+:root{--blue:#2563EB;--dark:#0F172A;--green:#059669;--red:#DC2626;--amber:#D97706;--teal:#0D9488;--text:#1E293B;--t2:#64748B;--t3:#94A3B8;--border:#E2E8F0;--bg:#F1F5F9}
+body{font-family:-apple-system,system-ui,sans-serif;background:var(--bg);color:var(--text)}
+/* HEADER */
+.hdr{background:var(--dark);padding:20px 20px 40px;text-align:center}
+.hdr-logo{font-size:48px;margin-bottom:10px}
+.hdr-title{color:#fff;font-size:22px;font-weight:700;letter-spacing:-.3px}
+.hdr-sub{color:rgba(255,255,255,.45);font-size:13px;margin-top:4px}
+/* NAV */
+.nav{background:#fff;border-bottom:1px solid var(--border);padding:0 16px;display:flex;gap:0;overflow-x:auto;-webkit-overflow-scrolling:touch;position:sticky;top:0;z-index:10}
+.nav::-webkit-scrollbar{display:none}
+.nav-btn{height:44px;padding:0 16px;border:none;background:none;font-size:13px;font-weight:500;color:var(--t2);white-space:nowrap;cursor:pointer;border-bottom:2px solid transparent;font-family:inherit;flex-shrink:0}
+.nav-btn.on{color:var(--blue);border-bottom-color:var(--blue);font-weight:600}
+/* SECTIONS */
+.section{display:none;padding:16px}
+.section.on{display:block}
+/* CARDS */
+.card{background:#fff;border-radius:14px;border:.5px solid var(--border);margin-bottom:12px;overflow:hidden}
+.card-hdr{padding:14px 16px;display:flex;align-items:center;gap:10px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.card-ico{font-size:24px;flex-shrink:0}
+.card-ttl{font-size:15px;font-weight:600;color:var(--text);flex:1}
+.card-arr{font-size:18px;color:var(--t3);transition:transform .2s}
+.card.open .card-arr{transform:rotate(90deg)}
+.card-body{display:none;padding:0 16px 14px;border-top:.5px solid var(--border)}
+.card.open .card-body{display:block}
+/* STEPS */
+.step{display:flex;gap:12px;margin-bottom:16px;padding-top:14px}
+.step-n{width:28px;height:28px;border-radius:50%;background:var(--blue);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.step-content .ttl{font-size:15px;font-weight:600;color:var(--text);margin-bottom:5px}
+.step-content .txt{font-size:14px;color:var(--t2);line-height:1.7}
+/* TIP */
+.tip{background:#FFFBEB;border:1px solid #FDE68A;border-radius:10px;padding:11px 13px;font-size:13px;color:#92400E;line-height:1.6;margin-top:8px;display:flex;gap:8px}
+.warn{background:#FEF2F2;border:1px solid #FECACA;border-radius:10px;padding:11px 13px;font-size:13px;color:#DC2626;line-height:1.6;margin-top:8px}
+.ok{background:#F0FDF4;border:1px solid #6EE7B7;border-radius:10px;padding:11px 13px;font-size:13px;color:#065F46;line-height:1.6;margin-top:8px}
+/* CAUSALES LIST */
+.caus-item{padding:11px 0;border-bottom:.5px solid var(--border)}
+.caus-item:last-child{border-bottom:none}
+.caus-name{font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px}
+.caus-type{display:inline-flex;align-items:center;font-size:11px;font-weight:500;padding:2px 8px;border-radius:20px;margin-bottom:6px}
+.type-int{background:#DBEAFE;color:#1E40AF}
+.type-ext{background:#F1F5F9;color:#475569}
+.caus-pregs{font-size:13px;color:var(--t2);line-height:1.7}
+/* TAG */
+.tag{display:inline-flex;font-size:11px;font-weight:500;padding:2px 8px;border-radius:20px}
+.tg-green{background:#D1FAE5;color:#065F46}
+.tg-blue{background:#DBEAFE;color:#1E40AF}
+.tg-amber{background:#FEF3C7;color:#92400E}
+/* FORMULA */
+.formula{background:var(--dark);border-radius:12px;padding:14px;margin-top:10px}
+.formula-txt{color:#fff;font-size:13px;text-align:center;font-weight:500;line-height:1.8}
+.formula-ttl{color:rgba(255,255,255,.5);font-size:11px;text-transform:uppercase;letter-spacing:.6px;text-align:center;margin-bottom:4px}
+/* BACK BTN */
+.back-btn{display:flex;align-items:center;gap:8px;background:none;border:none;cursor:pointer;font-size:14px;color:var(--blue);font-family:inherit;padding:0;margin-bottom:16px}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-logo">📱</div>
+  <div class="hdr-title">Manual S2S Point</div>
+  <div class="hdr-sub">Guía completa para promotoras</div>
+</div>
+
+<div class="nav" id="nav">
+  <button class="nav-btn on" onclick="showSec('s-inicio',this)">Inicio</button>
+  <button class="nav-btn" onclick="showSec('s-login',this)">1. Ingreso</button>
+  <button class="nav-btn" onclick="showSec('s-distdia',this)">2. Distribuidora</button>
+  <button class="nav-btn" onclick="showSec('s-pdv',this)">3. PDV</button>
+  <button class="nav-btn" onclick="showSec('s-pedido',this)">4. Pedido</button>
+  <button class="nav-btn" onclick="showSec('s-causales',this)">5. Causales</button>
+  <button class="nav-btn" onclick="showSec('s-metricas',this)">6. Métricas</button>
+  <button class="nav-btn" onclick="showSec('s-cierre',this)">7. Cierre</button>
+  <button class="nav-btn" onclick="showSec('s-tips',this)">Tips</button>
+</div>
+
+<!-- ═══ INICIO ═══ -->
+<div id="s-inicio" class="section on">
+  <div style="background:linear-gradient(135deg,#1D4ED8,#2563EB);border-radius:16px;padding:20px;margin-bottom:16px;text-align:center">
+    <p style="font-size:28px;margin-bottom:8px">👋</p>
+    <p style="color:#fff;font-size:16px;font-weight:600;margin-bottom:6px">¡Bienvenida a S2S Point!</p>
+    <p style="color:rgba(255,255,255,.7);font-size:13px;line-height:1.7">Esta app te ayuda a registrar tus visitas diarias a los puntos de venta de forma rápida y organizada.</p>
+  </div>
+  <div class="card">
+    <div style="padding:14px 16px">
+      <p style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:12px">📋 ¿Qué puedes hacer con S2S Point?</p>
+      <div style="display:flex;flex-direction:column;gap:9px">
+        <div style="display:flex;align-items:center;gap:10px;padding:10px;background:#F8FAFC;border-radius:10px">
+          <span style="font-size:20px">🚚</span>
+          <div><p style="font-size:13px;font-weight:600;color:var(--text)">Registrar distribuidora del día</p><p style="font-size:12px;color:var(--t3)">Una vez al inicio de la jornada</p></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px;background:#F8FAFC;border-radius:10px">
+          <span style="font-size:20px">🏪</span>
+          <div><p style="font-size:13px;font-weight:600;color:var(--text)">Buscar y registrar PDVs</p><p style="font-size:12px;color:var(--t3)">Base de datos cargada por usuario</p></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px;background:#F8FAFC;border-radius:10px">
+          <span style="font-size:20px">📦</span>
+          <div><p style="font-size:13px;font-weight:600;color:var(--text)">Registrar pedidos</p><p style="font-size:12px;color:var(--t3)">Productos, cantidades y precios</p></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px;background:#F8FAFC;border-radius:10px">
+          <span style="font-size:20px">⚠️</span>
+          <div><p style="font-size:13px;font-weight:600;color:var(--text)">Registrar causales de no venta</p><p style="font-size:12px;color:var(--t3)">11 causales con detalle adicional</p></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px;background:#F8FAFC;border-radius:10px">
+          <span style="font-size:20px">🔒</span>
+          <div><p style="font-size:13px;font-weight:600;color:var(--text)">Cierre y sincronización</p><p style="font-size:12px;color:var(--t3)">Resumen del día y envío a Sheets</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="tip"><span>💡</span><span>Toca cada sección del menú superior para ver el paso a paso detallado de cada función.</span></div>
+</div>
+
+<!-- ═══ LOGIN ═══ -->
+<div id="s-login" class="section">
+  <div class="step">
+    <div class="step-n">1</div>
+    <div class="step-content">
+      <div class="ttl">Ingresa tu usuario</div>
+      <div class="txt">Escribe tu código de usuario en mayúsculas.<br>Ejemplo: <strong>PROMAQP</strong></div>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-n">2</div>
+    <div class="step-content">
+      <div class="ttl">Ingresa tu contraseña</div>
+      <div class="txt">Tu contraseña es la misma que tu usuario.<br>Ejemplo: si eres <strong>PROMAQP</strong>, tu contraseña es <strong>PROMAQP</strong></div>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-n">3</div>
+    <div class="step-content">
+      <div class="ttl">Selecciona la fecha de trabajo</div>
+      <div class="txt">La app pre-carga automáticamente la fecha de <strong>hoy</strong>. Solo cámbiala si necesitas modificar registros de un día anterior.</div>
+      <div class="warn">⛔ No puedes ingresar con una fecha futura. Solo fechas de hoy o anteriores.</div>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-n">4</div>
+    <div class="step-content">
+      <div class="ttl">Confirmar fecha</div>
+      <div class="txt">La app mostrará la fecha seleccionada para confirmar. Toca <strong>"Sí, ingresar"</strong> para continuar o <strong>"Modificar"</strong> para cambiar la fecha.</div>
+    </div>
+  </div>
+  <div class="tip"><span>⚠️</span><span>Si ingresas con una fecha anterior, cada modificación que hagas será enviada a tu supervisor para aprobación.</span></div>
+</div>
+
+<!-- ═══ DISTRIBUIDORA ═══ -->
+<div id="s-distdia" class="section">
+  <div class="ok">✅ <strong>Primero configura la distribuidora del día</strong> antes de empezar a relevar. Solo se hace <strong>una vez por día</strong>.</div>
+  <br>
+  <div class="step">
+    <div class="step-n">1</div>
+    <div class="step-content">
+      <div class="ttl">Tocar "Distribuidora del día"</div>
+      <div class="txt">En la pantalla principal, toca el botón oscuro <strong>"Distribuidora del día"</strong> (primer botón de la lista).</div>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-n">2</div>
+    <div class="step-content">
+      <div class="ttl">Seleccionar distribuidora</div>
+      <div class="txt">Elige del desplegable la distribuidora que corresponde a tu ruta hoy. Solo verás las distribuidoras asignadas a tu usuario.</div>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-n">3</div>
+    <div class="step-content">
+      <div class="ttl">Tipo de mesa</div>
+      <div class="txt">Selecciona el tipo de mesa: <strong>MINORISTA</strong>, <strong>MAYORISTA</strong> o <strong>MIXTO</strong>.</div>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-n">4</div>
+    <div class="step-content">
+      <div class="ttl">Nombre del vendedor</div>
+      <div class="txt">Escribe el nombre del vendedor de la distribuidora que te acompaña hoy.</div>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-n">5</div>
+    <div class="step-content">
+      <div class="ttl">Confirmar</div>
+      <div class="txt">Toca <strong>"Confirmar distribuidora del día"</strong>. Esta configuración se aplicará automáticamente a todos tus relevos del día.</div>
+    </div>
+  </div>
+  <div class="tip"><span>💡</span><span>Una vez configurada, la distribuidora del día queda guardada. El botón cambia a color verde y muestra el nombre de la distribuidora elegida.</span></div>
+</div>
+
+<!-- ═══ PDV ═══ -->
+<div id="s-pdv" class="section">
+  <div class="card open">
+    <div class="card-hdr" onclick="toggleCard(this)">
+      <span class="card-ico">🔍</span>
+      <span class="card-ttl">Buscar un PDV existente</span>
+      <span class="card-arr">›</span>
+    </div>
+    <div class="card-body">
+      <div class="step">
+        <div class="step-n">1</div>
+        <div class="step-content">
+          <div class="ttl">Escribe el nombre del cliente</div>
+          <div class="txt">En el campo de búsqueda, escribe al menos 2 letras del nombre del PDV, su dirección o su distrito.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n">2</div>
+        <div class="step-content">
+          <div class="ttl">Seleccionar de la lista</div>
+          <div class="txt">Aparecerá una lista con los resultados. Toca el PDV correcto para seleccionarlo. Verás su nombre, dirección y ubicación confirmados.</div>
+        </div>
+      </div>
+      <div class="tip"><span>💡</span><span>Puedes buscar por nombre del cliente, dirección o distrito. La búsqueda incluye todos los PDVs de tu zona asignada.</span></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-hdr" onclick="toggleCard(this)">
+      <span class="card-ico">➕</span>
+      <span class="card-ttl">Crear un PDV nuevo</span>
+      <span class="card-arr">›</span>
+    </div>
+    <div class="card-body">
+      <div class="step" style="padding-top:14px">
+        <div class="step-n">1</div>
+        <div class="step-content">
+          <div class="ttl">Toca "Crear nuevo punto de venta"</div>
+          <div class="txt">Si no encuentras el cliente en la búsqueda, toca el botón con línea punteada.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n">2</div>
+        <div class="step-content">
+          <div class="ttl">Completa los campos</div>
+          <div class="txt">Llena: <strong>Nombre del PDV</strong>, <strong>Dirección</strong>.<br>Luego selecciona <strong>Departamento → Provincia → Distrito</strong> en ese orden.</div>
+          <div class="warn">⚠️ Todo en MAYÚSCULAS. Los filtros de provincia y distrito se habilitan automáticamente según tu zona asignada.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n">3</div>
+        <div class="step-content">
+          <div class="ttl">Crear y seleccionar</div>
+          <div class="txt">Toca <strong>"Crear PDV y seleccionar"</strong>. El nuevo PDV quedará seleccionado automáticamente y será enviado a tu supervisor para revisión.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-hdr" onclick="toggleCard(this)">
+      <span class="card-ico">📋</span>
+      <span class="card-ttl">Giro y Sub-Giro</span>
+      <span class="card-arr">›</span>
+    </div>
+    <div class="card-body">
+      <p style="font-size:14px;color:var(--t2);line-height:1.7;padding-top:12px">Siempre debes seleccionar el <strong>Giro</strong> y <strong>Sub-Giro</strong> del punto de venta, sea que lo busques o lo crees nuevo.</p>
+      <br>
+      <p style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px">Giros disponibles:</p>
+      <div style="display:flex;gap:7px;margin-bottom:10px"><span class="tag tg-blue">MINORISTA</span><span class="tag tg-blue">MAYORISTA</span></div>
+      <p style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:6px">Sub-Giros disponibles:</p>
+      <div style="display:flex;gap:5px;flex-wrap:wrap">
+        <span class="tag" style="background:#F1F5F9;color:#475569;margin-bottom:5px">ABARROTERO</span>
+        <span class="tag" style="background:#F1F5F9;color:#475569;margin-bottom:5px">FARMACIA</span>
+        <span class="tag" style="background:#F1F5F9;color:#475569;margin-bottom:5px">PERFUMERO</span>
+        <span class="tag" style="background:#F1F5F9;color:#475569;margin-bottom:5px">PAÑALERO</span>
+        <span class="tag" style="background:#F1F5F9;color:#475569;margin-bottom:5px">LIMPIEZA</span>
+        <span class="tag" style="background:#F1F5F9;color:#475569;margin-bottom:5px">VENTA AL PASO</span>
+        <span class="tag" style="background:#F1F5F9;color:#475569;margin-bottom:5px">FERRETERÍA</span>
+        <span class="tag" style="background:#F1F5F9;color:#475569;margin-bottom:5px">LIBRERÍA</span>
+        <span class="tag" style="background:#F1F5F9;color:#475569;margin-bottom:5px">BAZAR</span>
+        <span class="tag" style="background:#F1F5F9;color:#475569;margin-bottom:5px">OTRO</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PEDIDO ═══ -->
+<div id="s-pedido" class="section">
+  <div style="background:#F0FDF4;border:1px solid #6EE7B7;border-radius:12px;padding:13px;margin-bottom:14px">
+    <p style="font-size:14px;font-weight:600;color:#065F46;margin-bottom:4px">✓ ¿Realizó pedido? → SÍ REALIZÓ</p>
+    <p style="font-size:13px;color:#047857;line-height:1.6">Sigue estos pasos para registrar los productos del pedido.</p>
+  </div>
+  <div class="step">
+    <div class="step-n">1</div>
+    <div class="step-content">
+      <div class="ttl">Seleccionar "Sí realizó"</div>
+      <div class="txt">Toca el botón verde <strong>"✓ Sí realizó"</strong> en la sección de pedido.</div>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-n">2</div>
+    <div class="step-content">
+      <div class="ttl">Buscar productos</div>
+      <div class="txt">En el buscador de productos, escribe el nombre, marca o código EAN del producto. Ejemplo: <strong>Neko</strong>, <strong>Johnson</strong>, <strong>Neutrogena</strong>.</div>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-n">3</div>
+    <div class="step-content">
+      <div class="ttl">Agregar productos</div>
+      <div class="txt">Toca el producto de la lista para agregarlo. Puedes agregar múltiples productos al mismo pedido.</div>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-n">4</div>
+    <div class="step-content">
+      <div class="ttl">Ajustar cantidad y precio</div>
+      <div class="txt">Para cada producto:<br>• Usa los botones <strong>− y +</strong> para la cantidad<br>• Toca el campo de precio e ingresa el precio unitario en soles</div>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-n">5</div>
+    <div class="step-content">
+      <div class="ttl">Revisar total</div>
+      <div class="txt">El total del pedido se calcula automáticamente y se muestra en la barra oscura en la parte inferior de la tabla.</div>
+    </div>
+  </div>
+  <div class="tip"><span>💡</span><span>Puedes buscar por nombre del producto, por marca (Johnson's Baby, Neko, Neutrogena, Listerine, etc.) o por código EAN.</span></div>
+</div>
+
+<!-- ═══ CAUSALES ═══ -->
+<div id="s-causales" class="section">
+  <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:12px;padding:13px;margin-bottom:14px">
+    <p style="font-size:14px;font-weight:600;color:#991B1B;margin-bottom:4px">✗ ¿Realizó pedido? → NO REALIZÓ</p>
+    <p style="font-size:13px;color:#DC2626;line-height:1.6">Selecciona la causal que mejor describe por qué el cliente no realizó el pedido.</p>
+  </div>
+  <p style="font-size:13px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px">Causales internas (cuentan en efectividad):</p>
+  <div class="card" style="margin-bottom:12px">
+    <div class="card-body" style="display:block;padding:14px 16px">
+      <div class="caus-item">
+        <div class="caus-name">1. AUN TIENE STOCK / BAJA ROTACION</div>
+        <span class="caus-type type-int">Causal interna</span>
+        <div class="caus-pregs">Deberás indicar:<br>• <strong>Qué SKU tiene en stock</strong> (hasta 3 productos)<br>• <strong>Cuántas unidades aprox.</strong> tiene<br>• <strong>A cuánto vende</strong> la unidad o docena (mayorista)</div>
+      </div>
+      <div class="caus-item">
+        <div class="caus-name">2. RECHAZO POR PRECIO</div>
+        <span class="caus-type type-int">Causal interna</span>
+        <div class="caus-pregs">Deberás indicar:<br>• <strong>Qué marca competidora</strong> tiene el cliente<br>• <strong>A cuánto vende</strong> esa marca (por unidad o docena)</div>
+      </div>
+      <div class="caus-item">
+        <div class="caus-name">3. RECHAZO POR BAJO MARGEN DE GANANCIA</div>
+        <span class="caus-type type-int">Causal interna</span>
+        <div class="caus-pregs">Deberás indicar:<br>• <strong>Qué SKU tiene en stock</strong> (hasta 3)<br>• <strong>A qué distribuidora le compra</strong> (desplegable)<br>• <strong>A cuánto lo compra</strong><br>• <strong>A cuánto lo vende</strong></div>
+      </div>
+      <div class="caus-item">
+        <div class="caus-name">4. RECHAZA POR PRODUCTO BAJA CALIDAD</div>
+        <span class="caus-type type-int">Causal interna</span>
+        <div class="caus-pregs">Deberás indicar:<br>• <strong>A qué producto hace referencia</strong> (desplegable)<br>• <strong>Detalla el comentario del cliente</strong> (texto libre)</div>
+      </div>
+      <div class="caus-item">
+        <div class="caus-name">5. DISTRIBUIDOR NO TIENE STOCK</div>
+        <span class="caus-type type-int">Causal interna</span>
+        <div class="caus-pregs">Deberás indicar:<br>• <strong>Qué SKU quiere el cliente</strong> (desplegable del catálogo)<br>• <strong>Cuántas unidades</strong> quiere el cliente</div>
+      </div>
+    </div>
+  </div>
+  <p style="font-size:13px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px">Causales externas (NO cuentan en efectividad):</p>
+  <div class="card">
+    <div class="card-body" style="display:block;padding:14px 16px">
+      <div class="caus-item">
+        <div class="caus-name">6. CERRADO</div>
+        <span class="caus-type type-ext">Causal externa</span>
+        <div class="caus-pregs">Sin preguntas adicionales.</div>
+      </div>
+      <div class="caus-item">
+        <div class="caus-name">7. NO TIENE EFECTIVO / DINERO</div>
+        <span class="caus-type type-ext">Causal externa</span>
+        <div class="caus-pregs">Sin preguntas adicionales.</div>
+      </div>
+      <div class="caus-item">
+        <div class="caus-name">8. NO SE ENCONTRABA EL DUEÑO</div>
+        <span class="caus-type type-ext">Causal externa</span>
+        <div class="caus-pregs">Sin preguntas adicionales.</div>
+      </div>
+      <div class="caus-item">
+        <div class="caus-name">9. YA FUE VISITADO POR OTRO VENDEDOR</div>
+        <span class="caus-type type-ext">Causal externa</span>
+        <div class="caus-pregs">Deberás indicar:<br>• <strong>¿De qué distribuidora</strong> fue ese vendedor?</div>
+      </div>
+      <div class="caus-item">
+        <div class="caus-name">10. YA FUE VISITADO POR CORREDOR (QUEMA)</div>
+        <span class="caus-type type-ext">Causal externa</span>
+        <div class="caus-pregs">Sin preguntas adicionales.</div>
+      </div>
+      <div class="caus-item">
+        <div class="caus-name">11. NO VENDE NINGUNA CATEGORÍA</div>
+        <span class="caus-type type-ext">Causal externa</span>
+        <div class="caus-pregs">Sin preguntas adicionales.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MÉTRICAS ═══ -->
+<div id="s-metricas" class="section">
+  <p style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:14px">📊 ¿Qué significan los números de tu pantalla principal?</p>
+  <div class="card" style="margin-bottom:10px">
+    <div class="card-body" style="display:block;padding:14px 16px">
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div style="padding:12px;background:#F8FAFC;border-radius:10px">
+          <p style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px">🏪 Visitados</p>
+          <p style="font-size:13px;color:var(--t2);line-height:1.6">Total de PDVs donde has registrado una visita hoy, con o sin pedido.</p>
+        </div>
+        <div style="padding:12px;background:#F0FDF4;border-radius:10px">
+          <p style="font-size:13px;font-weight:700;color:var(--green);margin-bottom:4px">✅ Con venta</p>
+          <p style="font-size:13px;color:var(--t2);line-height:1.6">PDVs donde el cliente realizó un pedido.</p>
+        </div>
+        <div style="padding:12px;background:var(--blue-l);border-radius:10px">
+          <p style="font-size:13px;font-weight:700;color:var(--blue);margin-bottom:4px">📊 Neto visitados</p>
+          <p style="font-size:13px;color:var(--t2);line-height:1.6">Total de visitados <strong>menos</strong> los que tienen causales externas (cerrado, sin efectivo, no estaba el dueño, ya visitado corredor/vendedor, no vende la categoría).<br><br>Las causales <strong>internas</strong> (stock, precio, margen, calidad, dist. sin stock) SÍ cuentan en el neto.</p>
+        </div>
+        <div style="padding:12px;background:#F8FAFC;border-radius:10px">
+          <p style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px">📈 Efectividad</p>
+          <p style="font-size:13px;color:var(--t2);line-height:1.6">El porcentaje de tus visitas "reales" que terminaron en pedido.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="formula">
+    <div class="formula-ttl">Fórmula de efectividad</div>
+    <div class="formula-txt">Efectividad = Con Venta ÷ Neto Visitados × 100</div>
+  </div>
+  <br>
+  <div class="tip"><span>💡</span><span>Ejemplo: si visitaste 20 PDVs, 5 estaban cerrados (causales externas), y de los 15 restantes 10 compraron → Efectividad = 10 ÷ 15 = 67%</span></div>
+</div>
+
+<!-- ═══ CIERRE ═══ -->
+<div id="s-cierre" class="section">
+  <div class="step">
+    <div class="step-n">1</div>
+    <div class="step-content">
+      <div class="ttl">Toca "Cierre del día"</div>
+      <div class="txt">Al terminar tu jornada, toca el botón verde <strong>"Cierre del día"</strong> en la pantalla principal.</div>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-n">2</div>
+    <div class="step-content">
+      <div class="ttl">Revisa el resumen</div>
+      <div class="txt">Verás el resumen completo del día: PDVs visitados, con venta, sin venta, neto, efectividad y total en soles.</div>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-n">3</div>
+    <div class="step-content">
+      <div class="ttl">Enviar a tu supervisor</div>
+      <div class="txt">Toca <strong>"Enviar a supervisor / grupal (WhatsApp)"</strong> para compartir el resumen. También puedes copiarlo con el botón <strong>"Copiar mensaje"</strong>.</div>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-n">4</div>
+    <div class="step-content">
+      <div class="ttl">Sincronizar y cerrar el día</div>
+      <div class="txt">Después del cierre, toca <strong>"Sincronizar Relevos del Día"</strong>. La app verificará que todos tus registros estén en el sistema.<br><br>Si aparece el mensaje verde <strong>"Todos tus relevos de hoy están almacenados"</strong>, toca <strong>"Volver al inicio (Cerrar día)"</strong> para terminar completamente.</div>
+    </div>
+  </div>
+  <div class="warn">⛔ <strong>No cierres el app sin sincronizar.</strong> Si hay registros pendientes, estos podrían perderse. Siempre sincroniza antes de cerrar el día.</div>
+</div>
+
+<!-- ═══ TIPS ═══ -->
+<div id="s-tips" class="section">
+  <p style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:14px">⭐ Tips para usar S2S Point correctamente</p>
+  <div style="display:flex;flex-direction:column;gap:10px">
+    <div class="tip"><span>📶</span><span><strong>Sin internet no hay problema.</strong> Puedes registrar sin conexión. Los datos se guardan en tu teléfono y se sincronizan solos cuando tengas señal.</span></div>
+    <div class="tip"><span>🕕</span><span><strong>Haz el cierre antes de las 6 PM.</strong> La app te enviará recordatorios si no has cerrado. A las 6 PM recibirás una alerta.</span></div>
+    <div class="tip"><span>🔄</span><span><strong>Sincroniza siempre al final del día.</strong> Asegúrate de que todos tus relevos aparezcan en el sistema antes de cerrar.</span></div>
+    <div class="tip"><span>📋</span><span><strong>Distribuidora del día primero.</strong> Configura la distribuidora antes de empezar a relevar para que todos tus registros queden bien asociados.</span></div>
+    <div class="tip"><span>✏️</span><span><strong>¿Cometiste un error?</strong> Ve al historial y toca "Editar" en el registro que quieres modificar. La modificación se enviará a tu supervisor para aprobación.</span></div>
+    <div class="ok">✅ <strong>Todo se guarda en mayúsculas automáticamente.</strong> No te preocupes por el formato, la app lo ajusta sola.</div>
+    <div class="warn">⚠️ <strong>No cierres el app a la fuerza</strong> mientras estás registrando un pedido. Podría perderse el registro actual.</div>
+  </div>
+</div>
+
+<div style="height:40px"></div>
+
+<script>
+function showSec(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('on'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  btn.classList.add('on');
+  btn.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function toggleCard(hdr) {
+  const card = hdr.closest('.card');
+  card.classList.toggle('open');
+}
+</script>
+</body>
+</html>
