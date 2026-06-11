@@ -480,6 +480,7 @@ html,body{height:100%;overflow:hidden;background:var(--dark);font-family:-apple-
         <p style="font-size:13px;color:var(--t2);margin-top:3px" id="dd-res-mesa">—</p>
         <p style="font-size:13px;color:var(--t2);margin-top:2px" id="dd-res-vend">—</p>
       </div>
+      <button class="btn btn-white btn-sm" type="button" style="margin-top:12px" onclick="editarDD()">✏️ Editar distribuidora del día</button>
     </div>
     <div class="sec" id="dd-form">
       <div class="sec-hdr"><div class="sec-ico ic-blue">🚚</div><div><div class="sec-ttl">Configurar para hoy</div></div></div>
@@ -614,6 +615,17 @@ html,body{height:100%;overflow:hidden;background:var(--dark);font-family:-apple-
         <label class="lbl">Motivo de no venta <span class="req">*</span></label>
         <select class="sel" id="caus-sel" onchange="onCausalChange(this.value)">
           <option value="">— Seleccionar motivo —</option>
+          <option value="0">AUN TIENE STOCK / BAJA ROTACION</option>
+          <option value="1">RECHAZO POR PRECIO</option>
+          <option value="2">RECHAZO POR BAJO MARGEN DE GANANCIA</option>
+          <option value="3">RECHAZA POR PRODUCTO BAJA CALIDAD</option>
+          <option value="4">DISTRIBUIDORA SIN STOCK</option>
+          <option value="5">CERRADO</option>
+          <option value="6">NO TIENE EFECTIVO / DINERO</option>
+          <option value="7">NO SE ENCONTRABA EL DUENO</option>
+          <option value="8">YA FUE VISITADO POR OTRO VENDEDOR</option>
+          <option value="9">YA FUE VISITADO POR CORREDOR (QUEMA)</option>
+          <option value="10">NO VENDE NINGUNA CATEGORIA O NUESTRAS MARCAS</option>
         </select>
         <div id="caus-detail" style="display:none;margin-top:14px"></div>
       </div>
@@ -821,6 +833,18 @@ html,body{height:100%;overflow:hidden;background:var(--dark);font-family:-apple-
       <button class="btn btn-white btn-sm" type="button" onclick="closeModal('m-revisar')">Modificar</button>
       <button class="btn btn-dark btn-sm" type="button" onclick="confirmarRelevo()">✓ Confirmar</button>
     </div>
+  </div>
+</div>
+
+<!-- ══════ MODAL: FRASE MOTIVADORA DEL DIA ══════ -->
+<div class="modal" id="m-motiv">
+  <div class="modal-sheet" style="text-align:center">
+    <div class="m-handle"></div>
+    <div style="font-size:54px;margin-bottom:8px">💪</div>
+    <p style="font-size:13px;font-weight:600;color:var(--blue);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px">Mensaje del día</p>
+    <p id="motiv-text" style="font-size:17px;line-height:1.6;color:var(--text);font-weight:500;margin-bottom:8px;padding:0 6px"></p>
+    <p style="font-size:14px;font-weight:700;color:var(--green);margin-bottom:22px">¡Buenas ventas! 🚀</p>
+    <button class="btn btn-blue" type="button" id="motiv-btn" onclick="closeModal('m-motiv')">¡Vamos! →</button>
   </div>
 </div>
 

@@ -7,6 +7,97 @@
 //   - document.getElementById() directo
 // ════════════════════════════════════════════════════════
 
+// ─── FRASES MOTIVADORAS (60 frases unicas) ───────────────
+// Una promotora vera ~60 dias laborales antes de repetir
+var FRASES_MOTIV = [
+  'Cada PDV que visitas es una oportunidad. Hoy vas a sembrar relaciones que valen oro.',
+  'No vendes productos, construyes confianza. Y la confianza siempre paga sus dividendos.',
+  'El bodeguero recordara tu sonrisa antes que tu precio. Ve con la mejor.',
+  'El "no" de hoy es la practica para el "si" de manana. Sigue tocando puertas.',
+  'Eres el puente entre la marca y el cliente final. Sin ti, esta cadena no existe.',
+  'Las metas no se cumplen solas, se cumplen porque alguien como tu se levanta cada manana.',
+  'Cada visita es una historia, cada cliente una leccion. Hoy escribiras un nuevo capitulo.',
+  'No esperes el momento perfecto. Hoy es el dia. Hoy es la hora. Hoy se vende.',
+  'Tu actitud de hoy define las ventas de manana. Entra a cada PDV con energia ganadora.',
+  'Eres mas fuerte de lo que crees. Mas capaz de lo que imaginas. Hoy lo demostraras.',
+  'El esfuerzo de hoy es la celebracion de manana. Daselo todo a tu ruta.',
+  'Una venta empieza con un saludo sincero. Sonriele a cada cliente como si fuera el primero.',
+  'Los promotores promedio piden ordenes. Los excepcionales construyen socios. Se de los segundos.',
+  'No cuentes las visitas, haz que cada visita cuente. Calidad sobre cantidad.',
+  'Tu zona te necesita. Tus clientes te esperan. Tu meta te llama. Adelante.',
+  'Cuando un PDV no compra, no es un fracaso, es informacion. Aprende y vuelve mas fuerte.',
+  'La constancia vence al talento cuando el talento no es constante. Hoy te toca brillar.',
+  'Cada categoria vendida es un paso hacia tu objetivo. Cada SKU activado es una victoria.',
+  'No vendes con palabras, vendes con presencia. Camina con seguridad por cada calle.',
+  'El mejor vendedor no es el que mas habla, es el que mejor escucha. Pregunta antes de ofrecer.',
+  'Hoy alguien va a comprarte porque confio en ti. Honra esa confianza con tu trabajo.',
+  'Las ventas son emocion antes que razon. Conecta primero, vende despues.',
+  'No naciste para rendirte. Naciste para superar cada obstaculo que se te presente.',
+  'Tus pies se cansan, pero tu espiritu no. Camina una cuadra mas. Esa puede ser la venta del dia.',
+  'Hoy tu sonrisa puede ser la unica que ese bodeguero vea. Regalala sin medida.',
+  'El cierre del dia se construye desde el primer "hola". Empieza con todo.',
+  'Eres el rostro de Kenvue en la calle. Llevalo con orgullo y profesionalismo.',
+  'No hay tormenta que dure cien anos ni cliente que no se conquiste. Persiste.',
+  'Recuerda por que empezaste. Esa razon es mas grande que cualquier objecion.',
+  'Hoy es tu dia. Manana tambien. Y el siguiente. Cada dia es una oportunidad nueva.',
+  'Las mejores ventas no vienen del catalogo, vienen del corazon. Cree en lo que ofreces.',
+  'Cuando entres al PDV, deja afuera el cansancio. Adentro solo cabe tu mejor version.',
+  'Un "no" hoy puede ser un "si" la proxima semana. Construye relaciones, no transacciones.',
+  'El mercado tradicional no se mueve solo. Se mueve por personas como tu que lo activan.',
+  'La meta no es una linea de llegada, es una linea de partida diaria. Sale corriendo.',
+  'Tu esfuerzo deja huella en cada rincon del Peru. Hoy escribes historia personal.',
+  'No estas sola. Tu equipo te respalda. Tu marca te respalda. Y tu te respaldas a ti misma.',
+  'Cada bodega visitada es un pequeno triunfo. Suma triunfos hasta hacer historia.',
+  'Los mejores resultados nacen en los dias mas duros. Hoy puede ser uno de esos.',
+  'El precio se discute, el valor se vive. Demuestra valor en cada interaccion.',
+  'No vas a vender porque tienes que. Vas a vender porque puedes. Y hoy lo vas a hacer.',
+  'La diferencia entre cumplir y superar la meta esta en la ultima visita del dia. No te rindas.',
+  'Las objeciones son oportunidades disfrazadas. Aprende a desnudarlas con calma.',
+  'Tu trabajo importa. Tu cliente importa. Tu meta importa. Y tu, sobre todo, importas.',
+  'El sol sale para todos, pero solo los que se levantan lo aprovechan. Levantate.',
+  'Hoy seras la razon por la que un bodeguero diga: "Que bueno que me visitaron".',
+  'Eres una promotora, si. Pero antes eres una guerrera. Sale a la calle como tal.',
+  'Las ventas se hacen en la calle, no en el escritorio. Cada paso es ganancia.',
+  'Confia en el proceso. Confia en tu producto. Pero sobre todo, confia en ti misma.',
+  'No hay zona dificil, hay zonas que requieren mas estrategia. Tu la tienes.',
+  'Cada SKU que activas mejora la economia del bodeguero. Estas haciendo bien al pais.',
+  'El cliente compra al vendedor antes que al producto. Vende quien eres primero.',
+  'Las metas grandes se rompen en pasos pequenos. Da tu primer paso ahora.',
+  'Hoy alguien escribira que vendio mas que ayer. Que esa persona seas tu.',
+  'No hay venta pequena ni cliente menor. Cada interaccion suma a tu carrera.',
+  'Las promotoras top no esperan motivacion, la crean. Eres una de ellas.',
+  'Hoy vas a salir mas sabia de lo que entraste. Esa es la mejor venta del dia.',
+  'Cuando el cuerpo diga "ya no", el corazon diga "una mas". Una visita mas siempre.',
+  'Tu nombre va a ser recordado en cada PDV que visites. Que sea con respeto y carino.',
+  'El esfuerzo no se negocia. La constancia tampoco. Hoy aplicas ambas al maximo.',
+  'Cuando vuelvas a casa hoy, hazlo sabiendo que lo diste todo. Esa es la victoria real.'
+];
+
+function fraseDelDia() {
+  // Genera un hash unico basado en usuario + fecha para que cada dia y cada promotora
+  // vean una frase diferente, no se repita en mismo dia para mismo usuario
+  var seed = (APP_USER || 'X') + '_' + (APP_FECHA || today());
+  var hash = 0;
+  for (var i = 0; i < seed.length; i++) {
+    hash = ((hash << 5) - hash) + seed.charCodeAt(i);
+    hash = hash & hash;
+  }
+  hash = Math.abs(hash);
+  return FRASES_MOTIV[hash % FRASES_MOTIV.length];
+}
+
+function mostrarFraseMotivacional() {
+  // Solo mostrar 1 vez por dia por usuario
+  try {
+    var key = 's2s_motiv_shown_' + APP_USER + '_' + APP_FECHA;
+    if (localStorage.getItem(key)) return; // ya se mostro hoy
+    var txt = ge('motiv-text');
+    if (txt) txt.textContent = fraseDelDia();
+    openModal('m-motiv');
+    localStorage.setItem(key, '1');
+  } catch (e) { /* sin localStorage no pasa nada */ }
+}
+
 // ─── ESTADO GLOBAL ───────────────────────────────────────
 var APP_USER    = '';
 var APP_FECHA   = '';
@@ -282,6 +373,9 @@ function confirmLogin() {
   iniciarAutoSync();
   iniciarAlertas();
   G('s-home');
+
+  // Mostrar frase motivadora del dia (solo 1 vez por dia)
+  setTimeout(mostrarFraseMotivacional, 600);
 }
 
 // ─── CERRAR SESION ───────────────────────────────────────
@@ -431,6 +525,16 @@ function guardarDD() {
   gasPost({accion: 'DIST_DIA', usuario: APP_USER, fecha: APP_FECHA, dist: dist, mesa: mesa, vendedor: vend}, null);
   refreshHome();
   G('s-home');
+}
+
+function editarDD() {
+  // Mostrar el formulario y pre-cargar los valores actuales
+  if (!APP_DD) return;
+  var ds = ge('dd-set');  if (ds) ds.style.display = 'none';
+  var df = ge('dd-form'); if (df) df.style.display = 'block';
+  var dDist = ge('dd-dist'); if (dDist) dDist.value = APP_DD.dist;
+  var dMesa = ge('dd-mesa'); if (dMesa) dMesa.value = APP_DD.mesa;
+  var dVend = ge('dd-vend'); if (dVend) dVend.value = APP_DD.vend;
 }
 
 function irARelevear() {
@@ -1141,9 +1245,29 @@ function buildCierre() {
     stats.innerHTML = html;
   }
 
+  // Consolidar SKUs vendidos del dia: agrupar por EAN y sumar cantidades + total
+  var skuMap = {};
+  for (var i = 0; i < h.length; i++) {
+    if (h[i].modo !== 'si' || !h[i].pedido) continue;
+    for (var j = 0; j < h[i].pedido.length; j++) {
+      var p = h[i].pedido[j];
+      if (!skuMap[p.e]) skuMap[p.e] = {n: p.n, qty: 0, tot: 0};
+      skuMap[p.e].qty += (p.qty || 0);
+      skuMap[p.e].tot += (p.qty || 0) * (p.price || 0);
+    }
+  }
+  var skuLines = [];
+  for (var k in skuMap) {
+    skuLines.push('\u2022 ' + skuMap[k].n + ' (' + skuMap[k].qty + ' UND) = S/ ' + fmt(skuMap[k].tot));
+  }
+
   var lines = [];
   lines.push('\ud83d\udccb CIERRE DEL DIA \u2014 ' + fmtS(APP_FECHA));
   lines.push('\ud83d\udc64 ' + APP_USER);
+  if (APP_DD) {
+    lines.push('\ud83d\ude9a Distribuidora: ' + APP_DD.dist + ' \u00b7 ' + APP_DD.mesa);
+    lines.push('\ud83d\udc68\u200d\ud83d\udcbc Vendedor: ' + APP_DD.vend);
+  }
   lines.push('');
   lines.push('\ud83c\udfea PDVs visitados: ' + m.vis);
   lines.push('\u2705 Con venta: ' + m.cv);
@@ -1151,7 +1275,11 @@ function buildCierre() {
   lines.push('\ud83d\udcca Neto visitados: ' + m.neto);
   lines.push('\ud83d\udcc8 Efectividad: ' + m.ef + '%');
   lines.push('\ud83d\udcb0 Total S/: ' + fmt(m.tot));
-  if (APP_DD) { lines.push(''); lines.push('\ud83d\ude9a Distribuidora: ' + APP_DD.dist + ' \u00b7 ' + APP_DD.mesa); }
+  if (skuLines.length) {
+    lines.push('');
+    lines.push('\ud83d\udce6 SKUs vendidos:');
+    for (var i = 0; i < skuLines.length; i++) lines.push(skuLines[i]);
+  }
   lines.push('');
   lines.push('Enviado desde S2S Point');
 
