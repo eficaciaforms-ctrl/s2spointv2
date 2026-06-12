@@ -3,7 +3,7 @@
 // ═══════════════════════════════════════
 
 // PASO 1: Pega aqui la URL de tu GAS deployment
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzBzaHnyiKW6-x_wYo9FosU6xkJBEDLDPeVFSJyyE24yQEw2bgk1lMNUOOuumDFr8qq/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx-n9M4YtOE5bbN5DuyArsHAbu-sgaKA2vs8PrDkJdIG96g__e-_8XkARKG476osKA/exec';
 
 const APP_NAME    = 'S2S Point';
 const APP_VERSION = '1.0.0';
