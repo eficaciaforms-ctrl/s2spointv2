@@ -694,10 +694,16 @@ html,body{height:100%;overflow:hidden;background:var(--dark);font-family:-apple-
           <p style="font-size:16px;font-weight:700;color:#065F46">¡Todos tus relevos de hoy</p>
           <p style="font-size:16px;font-weight:700;color:#065F46;margin-bottom:6px">están almacenados!</p>
           <p style="font-size:13px;color:#047857" id="sy-ok-txt"></p>
+          <a href="https://forms.office.com/r/kgk54hh07D" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:10px;background:#1D4ED8;color:#fff;border-radius:12px;padding:14px 16px;text-decoration:none;font-size:14px;font-weight:600;margin-top:18px">
+            <span style="font-size:22px">📝</span>
+            <span style="text-align:left;line-height:1.3">Formulario Delivery STS<br><span style="font-size:11px;font-weight:400;opacity:.85">Rellenar formulario</span></span>
+            <span style="font-size:18px;margin-left:auto">›</span>
+          </a>
+          <p style="font-size:11px;color:#047857;margin-top:14px;line-height:1.5">⏱ La sesión se cerrará automáticamente en <span id="sy-cd-num" style="font-weight:700">60</span> segundos.</p>
         </div>
         <button class="btn btn-dark" type="button" style="margin-top:14px" id="sy-btn" onclick="doSync()">🔄 Validar y sincronizar</button>
         <div id="sy-volver" style="display:none;margin-top:11px">
-          <button class="btn btn-white" type="button" onclick="finalizarDia()">🏠 Volver al inicio (Cerrar día)</button>
+          <button class="btn btn-white" type="button" onclick="finalizarDia()">🔓 Cerrar sesión ahora</button>
         </div>
       </div>
     </div>

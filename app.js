@@ -160,6 +160,15 @@ function hideErr() {
 
 // ─── NAVEGACION ──────────────────────────────────────────
 function G(id) {
+  // Si el usuario sale de la pantalla de sync, cancelar el autocierre
+  if (id !== 's-sync') {
+    if (typeof _syncAutoCloseTimer !== 'undefined' && _syncAutoCloseTimer) {
+      clearTimeout(_syncAutoCloseTimer); _syncAutoCloseTimer = null;
+    }
+    if (typeof _syncCountdownInt !== 'undefined' && _syncCountdownInt) {
+      clearInterval(_syncCountdownInt); _syncCountdownInt = null;
+    }
+  }
   var screens = document.querySelectorAll('.scr');
   for (var i = 0; i < screens.length; i++) screens[i].classList.remove('on');
   var scr = ge(id);
@@ -223,7 +232,7 @@ function actualizarConexion() {
 
 function gasPost(data, cb) {
   if (!SCRIPT_URL || SCRIPT_URL === 'TU_SCRIPT_URL_AQUI') {
-    if (cb) setTimeout(function() { cb(true); }, 300);
+    if (cb) setTimeout(function() { cb(true, null); }, 300);
     return;
   }
   var xhr = new XMLHttpRequest();
@@ -233,12 +242,12 @@ function gasPost(data, cb) {
   xhr.onload = function() {
     try {
       var r = JSON.parse(xhr.responseText);
-      if (cb) cb(r.status === 'ok');
-    } catch (e) { if (cb) cb(false); }
+      if (cb) cb(r.status === 'ok', r);
+    } catch (e) { if (cb) cb(false, null); }
   };
-  xhr.onerror = function() { if (cb) cb(false); };
-  xhr.ontimeout = function() { if (cb) cb(false); };
-  try { xhr.send(JSON.stringify(data)); } catch (e) { if (cb) cb(false); }
+  xhr.onerror = function() { if (cb) cb(false, null); };
+  xhr.ontimeout = function() { if (cb) cb(false, null); };
+  try { xhr.send(JSON.stringify(data)); } catch (e) { if (cb) cb(false, null); }
 }
 
 function gasGet(params, cb) {
@@ -1490,7 +1499,14 @@ function copiarFallback(m) {
 }
 
 // ─── SINCRONIZAR ─────────────────────────────────────────
+// Timer global para autocierre tras sincronizacion exitosa
+var _syncAutoCloseTimer = null;
+var _syncCountdownInt   = null;
+
 function initSync() {
+  // Cancelar cualquier timer anterior si vuelve a entrar
+  if (_syncAutoCloseTimer) { clearTimeout(_syncAutoCloseTimer); _syncAutoCloseTimer = null; }
+  if (_syncCountdownInt)   { clearInterval(_syncCountdownInt);  _syncCountdownInt = null; }
   var h = histHoy();
   var sy = 0;
   for (var i = 0; i < h.length; i++) if (h[i].synced) sy++;
@@ -1551,12 +1567,40 @@ function syncDone(synced, total) {
     var st = ge('sy-ok-txt'); if (st) st.textContent = total + ' de ' + total + ' relevos almacenados';
     if (btn) btn.style.display = 'none';
     var sv = ge('sy-volver'); if (sv) sv.style.display = 'block';
+    // Iniciar autocierre de sesion en 60 segundos con countdown
+    iniciarAutoCierre(60);
   } else {
     if (btn) { btn.disabled = false; btn.textContent = '\ud83d\udd04 Reintentar (' + (total - synced) + ' pendientes)'; }
   }
 }
 
+function iniciarAutoCierre(segundos) {
+  // Limpiar timers previos
+  if (_syncAutoCloseTimer) { clearTimeout(_syncAutoCloseTimer); _syncAutoCloseTimer = null; }
+  if (_syncCountdownInt)   { clearInterval(_syncCountdownInt);  _syncCountdownInt = null; }
+  var restante = segundos;
+  var cdNum = ge('sy-cd-num');
+  if (cdNum) cdNum.textContent = restante;
+  // Actualizar contador cada segundo
+  _syncCountdownInt = setInterval(function() {
+    restante--;
+    var n = ge('sy-cd-num');
+    if (n) n.textContent = restante > 0 ? restante : 0;
+    if (restante <= 0) {
+      clearInterval(_syncCountdownInt);
+      _syncCountdownInt = null;
+    }
+  }, 1000);
+  // Cerrar sesion al cumplir el tiempo
+  _syncAutoCloseTimer = setTimeout(function() {
+    finalizarDia();
+  }, segundos * 1000);
+}
+
 function finalizarDia() {
+  // Limpiar timers de autocierre antes de salir
+  if (_syncAutoCloseTimer) { clearTimeout(_syncAutoCloseTimer); _syncAutoCloseTimer = null; }
+  if (_syncCountdownInt)   { clearInterval(_syncCountdownInt);  _syncCountdownInt = null; }
   setCierre();
   ejecutarSalida();
 }
@@ -1763,17 +1807,34 @@ function showDet(u) {
 var _detUserActual = '';
 
 function supBorrarRelevo(idr, user) {
-  if (!confirm('\u00bfBorrar este relevo de ' + user + '?\n\nEsto eliminara TODAS las filas de este relevo en el Google Sheets.\nEsta accion no se puede deshacer.')) return;
+  // Validacion estricta del ID
+  var idStr = String(idr || '').trim();
+  if (!idStr || idStr.length < 10 || !/^\d+$/.test(idStr)) {
+    alert('ID de relevo invalido. No se puede eliminar.\n\nID recibido: "' + idStr + '"');
+    return;
+  }
+  // Mostrar contexto del relevo especifico que se va a borrar
+  var d = _supData[user];
+  var visita = null;
+  if (d && d.visitas) {
+    for (var i = 0; i < d.visitas.length; i++) {
+      if (String(d.visitas[i].id) === idStr) { visita = d.visitas[i]; break; }
+    }
+  }
+  var detVisita = visita ? (visita.pdv + ' (' + (visita.hora || '--:--') + ')') : ('ID ' + idStr);
+  if (!confirm('\u00bfEliminar SOLO este relevo?\n\n' + detVisita + '\nUsuario: ' + user + '\n\nSe eliminaran unicamente las filas con el ID ' + idStr + '. Los otros relevos de la promotora NO se tocan.')) return;
   // Borrar en Google Sheets via GAS
-  gasPost({accion: 'BORRAR', id: String(idr)}, function(ok) {
+  gasPost({accion: 'BORRAR', id: idStr}, function(ok, resp) {
     if (ok) {
-      alert('\u2713 Relevo eliminado correctamente del Google Sheets');
+      var n = (resp && resp.borradas) ? resp.borradas : '?';
+      alert('\u2713 Relevo eliminado correctamente.\n\n' + n + ' fila(s) borrada(s) en Google Sheets.');
       // Recargar datos del equipo
       cargarDataEquipo();
       // Refrescar la pantalla actual
       setTimeout(function() { showDet(user); }, 800);
     } else {
-      alert('\u26a0\ufe0f No se pudo eliminar. Verifica tu conexion e intenta de nuevo.');
+      var msg = (resp && resp.msg) ? resp.msg : 'Verifica tu conexion e intenta de nuevo.';
+      alert('\u26a0\ufe0f No se pudo eliminar.\n\n' + msg);
     }
   });
 }
